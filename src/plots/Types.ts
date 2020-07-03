@@ -15,7 +15,7 @@ export interface PlotComponentProps<T extends keyof PlotData> {
   /** Style to be applied to container div element */
   style?: CSSProperties;
   /** Callback function to handle selection */
-  onSelection?: (range: [ number, number ]) => void;
+  onSelected?: (data: any) => void;
   /** Callback function to handle plot state change */
   onPlotUpdate?: (plotState: unknown) => void;
 }

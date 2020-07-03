@@ -32,7 +32,7 @@ const Plot = lazy(() => import('react-plotly.js'));
  * @param props 
  */
 export default function PlotlyPlot<T extends PlotDataKey>(props: Props<T>) {
-  const { data, layout = {}, frames = null, onPlotUpdate, mode, type } = props;
+  const { data, layout = {}, frames = null, onPlotUpdate, onSelected, mode, type } = props;
 
   const [ state, updateState ] = useState<Figure>({
     data: data.map(trace => ({
@@ -57,6 +57,7 @@ export default function PlotlyPlot<T extends PlotDataKey>(props: Props<T>) {
         frames={state.frames || undefined}
         onInitialized={handleUpdate}
         onUpdate={handleUpdate}
+        onSelected={onSelected}
       />
     </Suspense>
   )
