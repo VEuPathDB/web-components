@@ -75,7 +75,7 @@ export const PreBinnedContinuous3 = () => <Histogram
     name: 'series 2'
   }
   ]}
-  xLabel="numeric var"
+  xLabel="observation date"
   yLabel="count"
   mode="stack"
   binWidth={0.3}
