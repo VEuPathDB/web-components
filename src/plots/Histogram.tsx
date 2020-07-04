@@ -19,7 +19,7 @@ export default function Histogram(props: Props) {
   if (binWidth) {
     hdata = data.map( trace => ({
       width: binWidth,
-      offset: binWidth/-2,
+      offset: 0,
       ...trace
     }) );
   }

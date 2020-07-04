@@ -51,7 +51,7 @@ export const PreBinnedContinuous2 = () => <Histogram
   onPlotUpdate={action('state updated')}
   onSelected={action('selection made')}
   data={[{
-    x: [0.25, 0.55, 0.85],
+    x: [0.1, 0.4, 0.7],
     y: randomData(3).map((x) => Math.floor(100*x)),
     name: 'foo'
   }]}
@@ -65,12 +65,12 @@ export const PreBinnedContinuous3 = () => <Histogram
   onPlotUpdate={action('state updated')}
   onSelected={action('selection made')}
   data={[{
-    x: [0.25, 0.55, 0.85],
+    x: [0.1, 0.4, 0.7],
     y: randomData(3).map((x) => Math.floor(100*x)),
     name: 'series 1'
   },
   {
-    x: [0.25, 0.55, 0.85],
+    x: [0.1, 0.4, 0.7],
     y: randomData(3).map((x) => Math.floor(100*x)),
     name: 'series 2'
   }
