@@ -66,7 +66,7 @@ export default function HorizontalBarPlotAndLinePlot(props: Props) {
 
   for ( var i = 0 ; i < data.barX.length ; i++ ) {
 
-    var result : Partial<Annotations> = {
+    const result : Partial<Annotations> = {
       xref: 'x',
       yref: 'y',
       x: data.barX[i]+2.3,
@@ -75,11 +75,11 @@ export default function HorizontalBarPlotAndLinePlot(props: Props) {
       font: {
         family: 'Arial',
         size: 12,
-        color: 'rgb(50, 171, 96)'
+        color: 'blue'
       },
        showarrow: false,
     };
-    var result2 : Partial<Annotations> = {
+    const result2 : Partial<Annotations> = {
       xref: 'x2' as 'x',
       yref: 'y',
       x: data.lineX[i] - 25000,
@@ -88,15 +88,27 @@ export default function HorizontalBarPlotAndLinePlot(props: Props) {
       font: {
         family: 'Arial',
         size: 12,
-        color: 'rgb(128, 0, 128)'
+        color: 'blue'
       },
        showarrow: false
     };
     layout.annotations!.push(result, result2) ;
   }
 
- var trace1={x:data.barX, y:data.barY, xaxis: 'x',yaxis: 'y', type:'bar', orientation: 'h'}
- var trace2={x:data.lineX, y:data.lineY,xaxis: 'x2',yaxis: 'y'}
+ var trace1={
+   x:data.barX, 
+   y:data.barY, 
+   xaxis: 'x',
+   yaxis: 'y', 
+   type:'bar', 
+   orientation: 'h'
+  }
+ var trace2={
+   x:data.lineX, 
+   y:data.lineY,
+   xaxis: 'x2',
+   yaxis: 'y'
+  }
 
 
   return (
