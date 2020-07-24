@@ -9,7 +9,7 @@ interface Props<T extends PlotDataKey> extends PlotComponentProps<T> {
   /**
    * The type of Plotly plot
    */
-  type: PlotType;
+  type?: PlotType;
   /**
    * The mode of Plotly plot
    */
