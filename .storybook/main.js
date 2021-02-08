@@ -1,10 +1,16 @@
 module.exports = {
-  stories: ['../src/**/*.stories.js', '../src/**/*.stories.tsx'],
+  typescript: {
+    check: true
+  },
+  stories: [
+    '../src/**/!(_)*.stories.tsx',
+  ],
   addons: [
-    '@storybook/preset-typescript',
     '@storybook/addon-actions',
     '@storybook/addon-links',
     '@storybook/addon-docs',
+    '@storybook/addon-controls',
     '@storybook/addon-viewport/register',
+    './redmine-addon/register.js'
   ],
 };

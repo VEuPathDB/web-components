@@ -1,31 +1,45 @@
 import React from "react";
-import PlotlyPlot from "./PlotlyPlot";
-import { PlotComponentProps } from "./Types";
+import PlotlyPlot, { PlotProps, ModebarDefault } from "./PlotlyPlot";
+import { PlotData } from 'plotly.js';
 
-interface Props extends PlotComponentProps<'name'|'x'|'y'> {
+interface Props extends PlotProps {
+  data: {
+    name: PlotData['name'];
+    x: PlotData['x'];
+    y: PlotData['y'];
+  }[];
   /** Label for x-axis */
   xLabel: string;
   /** Label for y-axis */
-  yLabel: string;  
+  yLabel: string;
+  showLegend?: boolean;
 }
 
 export default function ScatterPlot(props: Props) {
-  const { xLabel, yLabel, ...plotlyProps } = props;
   const layout = {
     xaxis: {
-      title: xLabel
+      title: props.xLabel
     },
     yaxis: {
-      title: yLabel
+      title: props.yLabel
     }
   };
 
+  const data = props.data.map(d => ({ ...d, type: 'scatter', mode: 'markers' } as const));
+
   return (
     <PlotlyPlot
-      {...plotlyProps}
-      layout={layout}
-      type="scatter"
-      mode="markers"
+      data={data}
+      layout={Object.assign(layout, {
+        width: props.width,
+        height: props.height,
+        margin: props.margin,
+        showlegend: props.showLegend
+      })}
+      config={{
+        displayModeBar: props.showModebar !== undefined ? props.showModebar : ModebarDefault,
+        staticPlot: props.staticPlot,
+      }}
     />
   );
 }
