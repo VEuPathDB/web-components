@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import MiniDiagram from './MiniDiagram';
-import ExpandedDiagram from './ExpandedDiagram';
-import EntityDiagram from './EntityDiagram';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { StudyData, ShadingData } from './Types';
+import EntityDiagram, {
+  EntityDiagramProps,
+  ShadingData,
+} from './EntityDiagram';
+import { StudyData } from './Types';
+import { Meta, Story } from '@storybook/react';
 import './diagram.css';
 
 export default {
   title: 'Entity Diagram',
-};
+  component: EntityDiagram,
+} as Meta;
 
 const rootEntity: StudyData = {
   id: 'GEMS_House',
@@ -157,84 +159,23 @@ const studyData = {
   rootEntity: rootEntity,
 };
 
-const shadingData: ShadingData = {
-  GEMS_House: 0.05,
-  GEMS_HouseObs: 0.2,
-  GEMS_Part: 0.41,
-  GEMS_PartObs: 0.66,
-  GEMS_Treat: 0.98,
+type StoryProps = EntityDiagramProps & {
+  miniSize: {
+    height: number;
+    width: number;
+  };
+  expandedSize: {
+    height: number;
+    width: number;
+  };
 };
 
-const miniSize = { height: 300, width: 150 };
-const expandedSize = { height: 500, width: 600 };
-
-export const EntityDiagramSeparate = () => {
+export const EntityDiagramUnified: Story<StoryProps> = (args: StoryProps) => {
   const [orientation, setOrientation] = useState<'horizontal' | 'vertical'>(
     'vertical'
   );
   const [expanded, setExpanded] = useState<boolean>(false);
-
-  return (
-    <div
-      style={{
-        marginLeft: 40,
-        marginTop: 40,
-        width: 1000,
-        height: 700,
-      }}
-    >
-      <button
-        onClick={() =>
-          orientation == 'horizontal'
-            ? setOrientation('vertical')
-            : setOrientation('horizontal')
-        }
-      >
-        Switch Orientation
-      </button>
-      <button
-        onClick={() => (expanded ? setExpanded(false) : setExpanded(true))}
-      >
-        Switch Size
-      </button>
-      <div style={{ ...miniSize, border: '1px solid' }}>
-        <MiniDiagram
-          treeData={studyData.rootEntity}
-          orientation={orientation}
-          highlightedEntityID={'Sample'}
-          shadingData={shadingData}
-          size={miniSize}
-        />
-      </div>
-      <TransitionGroup>
-        {expanded && (
-          <CSSTransition
-            key="expanded-transition"
-            timeout={1000}
-            classNames="expanded-diagram"
-          >
-            <div style={{ ...expandedSize, border: '1px solid' }}>
-              <ExpandedDiagram
-                treeData={studyData.rootEntity}
-                orientation={orientation}
-                highlightedEntityID={'Sample'}
-                shadingData={shadingData}
-                size={expandedSize}
-              />
-            </div>
-          </CSSTransition>
-        )}
-      </TransitionGroup>
-    </div>
-  );
-};
-
-export const EntityDiagramUnified = () => {
-  const [orientation, setOrientation] = useState<'horizontal' | 'vertical'>(
-    'vertical'
-  );
-  const [expanded, setExpanded] = useState<boolean>(false);
-  const size = expanded ? expandedSize : miniSize;
+  const size = expanded ? args.expandedSize : args.miniSize;
 
   return (
     <div
@@ -261,14 +202,28 @@ export const EntityDiagramUnified = () => {
       </button>
       <div style={{ ...size, border: '1px solid' }}>
         <EntityDiagram
+          {...args}
           treeData={studyData.rootEntity}
           orientation={orientation}
           isExpanded={expanded}
           highlightedEntityID={'Sample'}
-          shadingData={shadingData}
+          shadingData={args.shadingData}
           size={size}
         />
       </div>
     </div>
   );
+};
+
+EntityDiagramUnified.args = {
+  miniSize: { height: 300, width: 150 },
+  expandedSize: { height: 500, width: 600 },
+  shadingData: {
+    GEMS_House: 0.05,
+    GEMS_HouseObs: 0.2,
+    GEMS_Part: 0.41,
+    GEMS_PartObs: 0.66,
+    GEMS_Sample: 0,
+    GEMS_Treat: 0.98,
+  },
 };
