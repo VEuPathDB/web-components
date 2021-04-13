@@ -18,6 +18,8 @@ type BaseProps<M extends NumberOrDate> = {
   label?: string;
   /** Additional styles for component container. Optional. */
   containerStyles?: React.CSSProperties;
+  // make prop for onChange property - needed to control user inputs & histogram
+  handleOnChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export type NumberInputProps = BaseProps<number>;
@@ -53,6 +55,8 @@ function BaseInput({
   label,
   valueType,
   containerStyles,
+  // add handleOnChange prop
+  handleOnChange,
 }: BaseInputProps) {
   const [focused, setFocused] = useState(false);
   const [errorState, setErrorState] = useState({
@@ -94,19 +98,9 @@ function BaseInput({
     if (newValue != null) onValueChange(newValue);
   }, [minValue, maxValue]);
 
-  const handleChange = (event: any) => {
-    if (event.target.value.length > 0) {
-      const newValue = boundsCheckedValue(
-        valueType === 'number'
-          ? Number(event.target.value)
-          : new Date(event.target.value)
-      );
-      if (newValue !== undefined) onValueChange(newValue);
-    } else {
-      // allows user to clear the input box
-      onValueChange(undefined);
-    }
-  };
+  // for conveniently editing, select all when focusing on an input field,
+  const handleFocus = (event: React.FocusEvent<HTMLInputElement>) =>
+    event.target.select();
 
   return (
     <div
@@ -122,9 +116,14 @@ function BaseInput({
               ? value
               : (value as Date)?.toISOString().substr(0, 10)
           }
+          // add name property for distinguishing what is changed (min or max)
+          name={label}
+          // add onFocus for conveniently editing the input field value
+          onFocus={handleFocus}
           type={valueType}
           variant="outlined"
-          onChange={handleChange}
+          // onChange to be props from parent, NumberAndDateRangeInputs component
+          onChange={handleOnChange}
           {...errorState}
         />
       </div>

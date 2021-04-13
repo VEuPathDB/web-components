@@ -225,6 +225,9 @@ export default function HistogramControls({
           valueType !== undefined && valueType === 'date' ? (
             <DateRangeInput
               label="Selected Range"
+              // need to set lowerLabel and upperLabel for handleOnChange (onChange)
+              lowerLabel="selectedRangeMin"
+              upperLabel="selectedRangeMax"
               rangeBounds={selectedRangeBounds as DateRange}
               range={selectedRange as DateRange}
               onRangeChange={onSelectedRangeChange}
@@ -232,6 +235,9 @@ export default function HistogramControls({
           ) : (
             <NumberRangeInput
               label="Selected Range"
+              // need to set lowerLabel and upperLabel for handleOnChange (onChange)
+              lowerLabel="selectedRangeMin"
+              upperLabel="selectedRangeMax"
               rangeBounds={selectedRangeBounds as NumberRange}
               range={selectedRange as NumberRange}
               onRangeChange={onSelectedRangeChange}

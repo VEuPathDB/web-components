@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 
 import { Typography } from '@material-ui/core';
 import { DARK_GRAY, MEDIUM_GRAY } from '../../constants/colors';
@@ -65,6 +65,48 @@ function BaseInput({
   const [focused, setFocused] = useState(false);
 
   const { min, max } = range ?? {};
+
+  // this will be sent to NumberAndDateInputs component as a prop to control user inputs
+  const handleOnChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.value.length > 0) {
+        const newValue =
+          valueType === 'number'
+            ? Number(event.target.value)
+            : new Date(event.target.value);
+        /**
+         * event.target.name (name prop at input form) is either lowerLabel or upperLabel
+         * they should be defined as props at the parent, HistogramControl,
+         *   to distinguish this Selected Range from other range widget
+         * here, they are named as selectedRangeMin and selectedRangeMax, respectively
+         */
+        if (
+          newValue !== undefined &&
+          event.target.name === 'selectedRangeMin'
+        ) {
+          onRangeChange
+            ? valueType === 'number'
+              ? onRangeChange({ min: newValue, max } as NumberRange)
+              : onRangeChange({ min: newValue, max } as DateRange)
+            : null;
+        } else if (
+          newValue !== undefined &&
+          event.target.name === 'selectedRangeMax'
+        ) {
+          onRangeChange
+            ? valueType === 'number'
+              ? onRangeChange({ min, max: newValue } as NumberRange)
+              : onRangeChange({ min, max: newValue } as DateRange)
+            : null;
+        }
+      } else {
+        // allows user to clear the input box - no need to have?
+        // onRangeChange? onRangeChange({ min, max } as NumberRange) : null;
+      }
+    },
+    [onRangeChange]
+  );
+
   return (
     <div
       style={{ ...containerStyles }}
@@ -86,6 +128,8 @@ function BaseInput({
             minValue={rangeBounds?.min as number}
             maxValue={(max ?? rangeBounds?.max) as number}
             label={lowerLabel}
+            // add a new prop
+            handleOnChange={handleOnChange}
             onValueChange={(newValue) => {
               if (newValue !== undefined && onRangeChange)
                 onRangeChange({ min: newValue, max } as NumberRange);
@@ -97,6 +141,8 @@ function BaseInput({
             minValue={rangeBounds?.min as Date}
             maxValue={(max ?? rangeBounds?.max) as Date}
             label={lowerLabel}
+            // add a new prop
+            handleOnChange={handleOnChange}
             onValueChange={(newValue) => {
               if (newValue !== undefined && onRangeChange)
                 onRangeChange({ min: newValue, max } as DateRange);
@@ -120,6 +166,8 @@ function BaseInput({
             minValue={(min ?? rangeBounds?.min) as number}
             maxValue={rangeBounds?.max as number}
             label={upperLabel}
+            // add a new prop
+            handleOnChange={handleOnChange}
             onValueChange={(newValue) => {
               if (newValue !== undefined && onRangeChange)
                 onRangeChange({ min, max: newValue } as NumberRange);
@@ -131,6 +179,8 @@ function BaseInput({
             minValue={(min ?? rangeBounds?.min) as Date}
             maxValue={rangeBounds?.max as Date}
             label={upperLabel}
+            // add a new prop
+            handleOnChange={handleOnChange}
             onValueChange={(newValue) => {
               if (newValue !== undefined && onRangeChange)
                 onRangeChange({ min, max: newValue } as DateRange);
