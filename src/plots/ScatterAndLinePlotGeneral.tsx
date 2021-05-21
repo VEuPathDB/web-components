@@ -8,7 +8,7 @@ type PlotDataKey = keyof PlotData;
 
 // change interface a bit more: this could avoid error on data type
 export interface ScatterplotProps<T extends keyof PlotData> extends PlotProps {
-  data: Pick<PlotData, T>[];
+  data: any; // Pick<PlotData, T>[];
   xLabel?: string;
   yLabel?: string;
   plotTitle?: string;
