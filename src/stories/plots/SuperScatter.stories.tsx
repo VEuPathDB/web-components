@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ScatterAndLinePlotGeneral from '../../plots/ScatterAndLinePlotGeneral';
 import Histogram from '../../plots/Histogram';
-import { HistogramData, HistogramBin } from '../../types/plots';
+import AxisControls from '../../components/plotControls/AxisControls';
+
+import { HistogramData } from '../../types/plots';
+import { NumberRange } from '../../types/general';
+import { NumberOrDateRange } from '../../../lib/types/general';
 
 export default {
   title: 'Plots/SuperScatter',
@@ -99,7 +103,10 @@ export const SuperScatter = () => {
     ],
   };
 
-  const [xMin, xMax, yMin, yMax] = [0, 10, 0, 10];
+  const defaultXRange = { min: 0, max: 10 };
+  const defaultYRange = { min: 0, max: 10 };
+  const [xRange, setXRange] = useState<NumberRange>(defaultXRange);
+  const [yRange, setYRange] = useState<NumberRange>(defaultYRange);
 
   return (
     <div
@@ -109,22 +116,45 @@ export const SuperScatter = () => {
         <Histogram
           data={histoDataX}
           width={mainPlotWidth}
-          height={mainPlotHeight / 2}
+          height={mainPlotHeight * 0.75}
           orientation="vertical"
           barLayout="group"
           displayLegend={false}
           displayLibraryControls={false}
+          independentAxisRange={xRange}
         />
       </div>
-      <div style={{ flex: '1 1 45%', border: '1px solid pink' }}></div>
+      <div style={{ flex: '1 1 45%', border: '1px solid pink' }}>
+        <AxisControls
+          label="x axis"
+          axisRange={xRange}
+          onAxisRangeChange={(newRange?: NumberOrDateRange) => {
+            setXRange(newRange as NumberRange);
+          }}
+          onAxisReset={() => {
+            setXRange(defaultXRange);
+          }}
+        />
+
+        <AxisControls
+          label="y axis"
+          axisRange={yRange}
+          onAxisRangeChange={(newRange?: NumberOrDateRange) => {
+            setYRange(newRange as NumberRange);
+          }}
+          onAxisReset={() => {
+            setXRange(defaultYRange);
+          }}
+        />
+      </div>
       <div style={{ flex: '1 1 45%', border: '1px solid green' }}>
         <ScatterAndLinePlotGeneral
           data={scatterData}
           xLabel={xLabel}
           yLabel={yLabel}
           plotTitle={plotTitle}
-          xRange={[xMin, xMax]}
-          yRange={[yMin, yMax]}
+          xRange={[xRange.min, xRange.max]}
+          yRange={[yRange.min, yRange.max]}
           width={mainPlotWidth}
           height={mainPlotHeight}
           staticPlot={true}
@@ -135,12 +165,13 @@ export const SuperScatter = () => {
       <div style={{ flex: '1 1 45%', border: '1px solid blue' }}>
         <Histogram
           data={histoDataY}
-          width={mainPlotWidth / 2}
+          width={mainPlotWidth * 0.75}
           height={mainPlotHeight}
           orientation="horizontal"
           barLayout="group"
           displayLegend={false}
           displayLibraryControls={false}
+          independentAxisRange={yRange}
         />
       </div>
     </div>
