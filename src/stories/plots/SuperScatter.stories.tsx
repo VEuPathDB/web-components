@@ -112,7 +112,7 @@ export const SuperScatter = () => {
     <div
       style={{ display: 'flex', flexWrap: 'wrap', width: mainPlotWidth * 2 }}
     >
-      <div style={{ flex: '1 1 45%', border: '1px solid black' }}>
+      <div style={{ flex: '1 1 45%' }}>
         <Histogram
           data={histoDataX}
           width={mainPlotWidth}
@@ -124,7 +124,7 @@ export const SuperScatter = () => {
           independentAxisRange={xRange}
         />
       </div>
-      <div style={{ flex: '1 1 45%', border: '1px solid pink' }}>
+      <div style={{ flex: '1 1 45%' }}>
         <AxisControls
           label="x axis"
           axisRange={xRange}
@@ -143,11 +143,11 @@ export const SuperScatter = () => {
             setYRange(newRange as NumberRange);
           }}
           onAxisReset={() => {
-            setXRange(defaultYRange);
+            setYRange(defaultYRange);
           }}
         />
       </div>
-      <div style={{ flex: '1 1 45%', border: '1px solid green' }}>
+      <div style={{ flex: '1 1 45%' }}>
         <ScatterAndLinePlotGeneral
           data={scatterData}
           xLabel={xLabel}
@@ -162,7 +162,7 @@ export const SuperScatter = () => {
           displayLibraryControls={false}
         />
       </div>
-      <div style={{ flex: '1 1 45%', border: '1px solid blue' }}>
+      <div style={{ flex: '1 1 45%' }}>
         <Histogram
           data={histoDataY}
           width={mainPlotWidth * 0.75}
@@ -177,30 +177,3 @@ export const SuperScatter = () => {
     </div>
   );
 };
-
-function getMinDate(dates: Date[]) {
-  return new Date(Math.min(...dates.map(Number)));
-}
-
-function getMaxDate(dates: Date[]) {
-  return new Date(Math.max(...dates.map(Number)));
-}
-
-function getBounds<T extends number | Date>(
-  values: T[],
-  standardErrors: T[]
-): {
-  yUpperValues: T[];
-  yLowerValues: T[];
-} {
-  const yUpperValues = values.map((value, idx) => {
-    const tmp = Number(value) + 2 * Number(standardErrors[idx]);
-    return value instanceof Date ? (new Date(tmp) as T) : (tmp as T);
-  });
-  const yLowerValues = values.map((value, idx) => {
-    const tmp = Number(value) - 2 * Number(standardErrors[idx]);
-    return value instanceof Date ? (new Date(tmp) as T) : (tmp as T);
-  });
-
-  return { yUpperValues, yLowerValues };
-}
