@@ -17,7 +17,10 @@ const UpSetJS = lazy(() => import('@upsetjs/react'));
 export default function UpSet(props: UpSetProps) {
   const {
     data = EmptyUpSetData,
-    title, // all the props below would normally be handled by PlotlyPlot, so we need to handle them here instead
+    intersectionSizeAxisLabel,
+    setSizeAxisLabel,
+    // all the props below would normally be handled by PlotlyPlot, so we need to handle them here instead
+    title,
     displayLegend = true,
     containerStyles = { width: '100%', height: '400px' },
     interactive = false,
