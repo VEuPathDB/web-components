@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import { PlotProps } from './PlotlyPlot';
 import { UpSetData } from '../types/plots';
-import UpSetJS, { ISetLike } from '@upsetjs/react';
+// import { ISetLike } from '@upsetjs/react';
 
 export interface UpSetProps extends PlotProps<UpSetData> {
   /** label for intersection size axis */
@@ -10,6 +10,8 @@ export interface UpSetProps extends PlotProps<UpSetData> {
   setSizeAxisLabel?: string;
 }
 const EmptyUpSetData: UpSetData = { sets: [], combinations: [] };
+
+const UpSetJS = lazy(() => import('@upsetjs/react'));
 
 export default function UpSet(props: UpSetProps) {
   const {
@@ -28,5 +30,5 @@ export default function UpSet(props: UpSetProps) {
   // convert `data` into UpSetJS-friendly `sets` and `combinations`
 
   // TO DO: wrap in Suspense and Spinner stuff (copy from PlotlyPlot.tsx)
-  return <UpSetJS set={sets} combinations={combinations} />;
+  return <UpSetJS sets={sets} combinations={combinations} />;
 }
