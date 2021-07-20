@@ -1,8 +1,6 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
 import UpSet, { UpSetProps } from '../../plots/UpSet';
-import stats from 'stats-lite';
-import _ from 'lodash';
 
 export default {
   title: 'Plots/UpSet',
