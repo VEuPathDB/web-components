@@ -84,6 +84,7 @@ export type CategoricalAxisAddon = {
    * default = use categoricalAxisCategoryOrder (or if not provided, use the order already in the data)
    * ascending/descending = alphanumeric sort of category label
    * values ascending/descending = sort by sum of values for each category (e.g. total stacked bar height)
+   * (this doesn't seem to work for boxplots constructed with summary data)
    */
   categoricalAxisOrderMethod?:
     | 'default'
@@ -99,7 +100,7 @@ export type CategoricalAxisAddon = {
 export function categoricalAxisPlotlyProps(
   method?: CategoricalAxisAddon['categoricalAxisOrderMethod'],
   order?: CategoricalAxisAddon['categoricalAxisCategoryOrder']
-): Layout['xaxis'] {
+): Partial<Layout['xaxis']> {
   if (method == null || method === 'default') {
     if (order != null) {
       return {
@@ -116,7 +117,7 @@ export function categoricalAxisPlotlyProps(
       case 'labels descending':
         return { categoryorder: 'category descending' };
       case 'values ascending':
-        return { categoryorder: 'sum ascending' };
+        return { categoryorder: 'sum ascending' }; // even 'mean ascending' doesn't work well for our pre-calculated boxplots
       case 'values descending':
         return { categoryorder: 'sum descending' };
       default:

@@ -4,6 +4,8 @@ import { PlotParams } from 'react-plotly.js';
 import PlotlyPlot, { PlotProps } from './PlotlyPlot';
 import {
   BoxplotData,
+  CategoricalAxisAddon,
+  categoricalAxisPlotlyProps,
   OpacityAddon,
   OpacityDefault,
   OrientationAddon,
@@ -14,7 +16,8 @@ import { NumberOrDateRange } from '../types/general';
 export interface BoxplotProps
   extends PlotProps<BoxplotData>,
     OrientationAddon,
-    OpacityAddon {
+    OpacityAddon,
+    CategoricalAxisAddon {
   /** label for independent axis */
   independentAxisLabel?: string;
   /** label for the (typically) y-axis, e.g. Wealth */
@@ -47,6 +50,8 @@ export default function Boxplot(props: BoxplotProps) {
     showIndependentAxisTickLabel = true,
     showDependentAxisTickLabel = true,
     dependentValueType = 'number',
+    categoricalAxisOrderMethod,
+    categoricalAxisCategoryOrder,
     ...restProps
   } = props;
 
@@ -104,6 +109,10 @@ export default function Boxplot(props: BoxplotProps) {
       range: data.length ? undefined : [1, 5], // avoids x==0 line
       tickfont: data.length ? {} : { color: 'transparent' },
       showticklabels: showIndependentAxisTickLabel,
+      ...categoricalAxisPlotlyProps(
+        categoricalAxisOrderMethod,
+        categoricalAxisCategoryOrder
+      ),
     },
     [dependentAxis]: {
       automargin: true,
