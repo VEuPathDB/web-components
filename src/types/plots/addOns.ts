@@ -2,6 +2,7 @@
  * Additional reusable modules to extend PlotProps and PlotData props
  */
 
+import { Layout } from 'plotly.js';
 import { CSSProperties } from 'react';
 import { BarLayoutOptions, OrientationOptions } from '.';
 
@@ -76,6 +77,53 @@ export type ContainerStylesAddon = {
   /** Additional styles for component's container. Optional */
   containerStyles?: CSSProperties;
 };
+
+/** categorical axes */
+export type CategoricalAxisAddon = {
+  /** sort method:
+   * default = use categoricalAxisCategoryOrder (or if not provided, use the order already in the data)
+   * ascending/descending = alphanumeric sort of category label
+   * values ascending/descending = sort by sum of values for each category (e.g. total stacked bar height)
+   */
+  categoricalAxisOrderMethod?:
+    | 'default'
+    | 'labels ascending'
+    | 'labels descending'
+    | 'values ascending'
+    | 'values descending';
+  /** desired order of categories */
+  categoricalAxisCategoryOrder?: string[];
+};
+
+/** helper function to process Categorical Axis props into plotly axis props */
+export function categoricalAxisPlotlyProps(
+  method?: CategoricalAxisAddon['categoricalAxisOrderMethod'],
+  order?: CategoricalAxisAddon['categoricalAxisCategoryOrder']
+): Layout['xaxis'] {
+  if (method == null || method === 'default') {
+    if (order != null) {
+      return {
+        categoryorder: 'array',
+        categoryarray: order,
+      };
+    } else {
+      return {};
+    }
+  } else {
+    switch (method) {
+      case 'labels ascending':
+        return { categoryorder: 'category ascending' };
+      case 'labels descending':
+        return { categoryorder: 'category descending' };
+      case 'values ascending':
+        return { categoryorder: 'sum ascending' };
+      case 'values descending':
+        return { categoryorder: 'sum descending' };
+      default:
+        return {};
+    }
+  }
+}
 
 /** PlotData addons */
 export type AvailableUnitsAddon =

@@ -3,6 +3,8 @@ import { PlotParams } from 'react-plotly.js';
 import {
   BarLayoutAddon,
   BarplotData,
+  CategoricalAxisAddon,
+  categoricalAxisPlotlyProps,
   OpacityAddon,
   OpacityDefault,
   OrientationAddon,
@@ -16,7 +18,8 @@ export interface BarplotProps
   extends PlotProps<BarplotData>,
     BarLayoutAddon<'overlay' | 'stack' | 'group'>,
     OrientationAddon,
-    OpacityAddon {
+    OpacityAddon,
+    CategoricalAxisAddon {
   /** Label for independent axis. e.g. 'Country' */
   independentAxisLabel?: string;
   /** Label for dependent axis. Defaults to 'Count' */
@@ -42,6 +45,8 @@ export default function Barplot({
   barLayout = 'group',
   showIndependentAxisTickLabel = true,
   showDependentAxisTickLabel = true,
+  categoricalAxisCategoryOrder,
+  categoricalAxisOrderMethod,
   ...restProps
 }: BarplotProps) {
   // Transform `data` into a Plot.ly friendly format.
@@ -82,6 +87,10 @@ export default function Barplot({
     range: data.series.length ? undefined : [0, 10],
     tickfont: data.series.length ? {} : { color: 'transparent' },
     showticklabels: showIndependentAxisTickLabel,
+    ...categoricalAxisPlotlyProps(
+      categoricalAxisOrderMethod,
+      categoricalAxisCategoryOrder
+    ),
   };
 
   const dependentAxisLayout: Layout['yaxis'] | Layout['xaxis'] = {
