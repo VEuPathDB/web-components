@@ -9,6 +9,7 @@ import { XYPlotData } from './xyplot';
 import { BarplotData } from './barplot';
 import { HeatmapData } from './heatmap';
 import { MosaicData } from './mosaic';
+import { UpSetData } from './upset';
 
 // Commonly used type definitions for plots.
 
@@ -23,7 +24,8 @@ export type UnionOfPlotDataTypes =
   | XYPlotData
   | BarplotData
   | HeatmapData
-  | MosaicData;
+  | MosaicData
+  | UpSetData;
 
 export * from './addOns';
 
@@ -35,3 +37,4 @@ export * from './xyplot';
 export * from './barplot';
 export * from './heatmap';
 export * from './mosaic';
+export * from './upset';

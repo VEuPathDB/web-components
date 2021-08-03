@@ -12,6 +12,7 @@
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@types/date-arithmetic": "^4.1.1",
+    "@upsetjs/react": "^1.9.1",
     "@visx/gradient": "^1.0.0",
     "@visx/group": "^1.0.0",
     "@visx/hierarchy": "^1.0.0",
