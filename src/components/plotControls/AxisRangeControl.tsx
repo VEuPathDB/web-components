@@ -18,6 +18,8 @@ export interface AxisRangeControlProps
   range?: NumberOrDateRange;
   /** function to call when widget updates the range */
   onRangeChange?: (newRange?: NumberOrDateRange) => void;
+  /** DKDK default/initial independent axis range */
+  defaultIndependentAxisRange?: NumberOrDateRange;
 }
 
 export default function AxisRangeControl({
@@ -26,6 +28,8 @@ export default function AxisRangeControl({
   range,
   onRangeChange,
   containerStyles,
+  //DKDK
+  defaultIndependentAxisRange,
 }: AxisRangeControlProps) {
   const validator = useCallback((range?: NumberOrDateRange): {
     validity: boolean;
@@ -56,6 +60,10 @@ export default function AxisRangeControl({
         allowPartialRange={false}
         containerStyles={containerStyles}
         validator={validator}
+        //DKDK
+        defaultIndependentAxisRange={defaultIndependentAxisRange}
+        //DKDK add something that this comes from axis range control
+        isAxisRangeControl={true}
       />
     ) : (
       <NumberRangeInput
@@ -65,6 +73,10 @@ export default function AxisRangeControl({
         allowPartialRange={false}
         containerStyles={containerStyles}
         validator={validator}
+        //DKDK
+        defaultIndependentAxisRange={defaultIndependentAxisRange}
+        //DKDK add something that this comes from axis range control
+        isAxisRangeControl={true}
       />
     )
   ) : null;

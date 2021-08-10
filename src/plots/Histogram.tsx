@@ -60,6 +60,8 @@ export interface HistogramProps
   independentAxisRange?: NumberOrDateRange;
   /** if true (default false), adjust binEnds to the end of the day */
   adjustBinEndToEndOfDay?: boolean;
+  /** DKDK default/initial independent axis range */
+  defaultIndependentAxisRange?: NumberOrDateRange;
 }
 
 /** A Plot.ly based histogram component. */
@@ -79,6 +81,8 @@ export default function Histogram({
   isZoomed = false,
   independentAxisRange,
   adjustBinEndToEndOfDay = false,
+  //DKDK
+  defaultIndependentAxisRange,
   ...restProps
 }: HistogramProps) {
   /**
@@ -337,14 +341,215 @@ export default function Histogram({
     adjustBinEndToEndOfDay,
   ]);
 
+  //DKDK
+  // const plotlyIndependentAxisRange = useMemo(() => {
+  //   // here we ensure that no data bins are excluded/hidden from view
+  //   const range = [
+  //     independentAxisRange && independentAxisRange.min < minBinStart
+  //       ? independentAxisRange.min
+  //       : minBinStart,
+  //     independentAxisRange && independentAxisRange?.max > maxBinEnd
+  //       ? independentAxisRange.max
+  //       : maxBinEnd,
+  //   ];
+  //   // extend date-based range.max to the end of the day
+  //   // (this also avoids excluding a the final bin if binWidth=='day')
+  //   if (data?.valueType === 'date') {
+  //     return [
+  //       range[0],
+  //       adjustBinEndToEndOfDay
+  //         ? DateMath.endOf(new Date(range[1]), 'day').toISOString()
+  //         : range[1],
+  //     ];
+  //   } else {
+  //     return range;
+  //   }
+  // }, [
+  //   data?.valueType,
+  //   independentAxisRange,
+  //   minBinStart,
+  //   maxBinEnd,
+  //   adjustBinEndToEndOfDay,
+  // ]);
+
+  //DKDK make rectangular shapes for truncated axis/missing data
+  const truncatedAxisHighlighting:
+    | Partial<Shape>[]
+    | undefined = useMemo(() => {
+    // const range = independentAxisRange;
+    const range = {
+      min:
+        independentAxisRange && independentAxisRange.min < minBinStart
+          ? independentAxisRange.min
+          : minBinStart,
+      max:
+        independentAxisRange && independentAxisRange?.max > maxBinEnd
+          ? independentAxisRange.max
+          : maxBinEnd,
+    };
+    //DKDK add condition... but this does not work as the case that only min or max changes do not work
+    if (
+      data.series.length &&
+      range
+      // && defaultIndependentAxisRange?.min !== independentAxisRange?.min
+      // && defaultIndependentAxisRange?.max !== independentAxisRange?.max
+    ) {
+      // for dates, draw the blue area to the end of the day
+      const rightCoordinate =
+        data.valueType === 'number'
+          ? range.max
+          : adjustBinEndToEndOfDay
+          ? DateMath.endOf(new Date(range.max), 'day').toISOString()
+          : range.max;
+
+      //DKDK
+      console.log(
+        'histogram defaultIndependentAxisRange = ',
+        defaultIndependentAxisRange?.min,
+        defaultIndependentAxisRange?.max
+      );
+      console.log('histogram range =', range.min, range.max);
+      console.log('histogram rightCoordinate =', rightCoordinate);
+
+      //DKDK need to check where I will use rightCoordinate...!!!
+      // return [
+      //   {
+      //     type: 'rect',
+      //     ...(orientation === 'vertical'
+      //       ? [{
+      //           xref: 'x',
+      //           yref: 'paper',
+      //           x0: defaultIndependentAxisRange?.min,
+      //           x1: range.min,
+      //           y0: 0,
+      //           y1: 1,
+      //         },
+      //         {
+      //           xref: 'x',
+      //           yref: 'paper',
+      //           x0: range.max,
+      //           x1: defaultIndependentAxisRange?.max,
+      //           y0: 0,
+      //           y1: 1,
+      //         }]
+      //       : [{
+      //           xref: 'paper',
+      //           yref: 'y',
+      //           x0: 0,
+      //           x1: 1,
+      //           y0: defaultIndependentAxisRange?.min,
+      //           y1: range.min,
+      //         },{
+      //           xref: 'paper',
+      //           yref: 'y',
+      //           x0: 0,
+      //           x1: 1,
+      //           y0: range.max,
+      //           y1: defaultIndependentAxisRange?.max,
+      //         }]),
+      //     line: {
+      //       width: 0,
+      //     },
+      //     fillcolor: '#d3d3d3',
+      //     opacity: 1,
+      //   },
+      //   ];
+
+      //DKDK this works!
+      if (orientation === 'vertical')
+        return [
+          {
+            type: 'rect',
+            line: {
+              width: 0,
+              dash: 'dash',
+            },
+            fillcolor: '#d3d3d3',
+            //DKDK pattern fill?
+            fill: 'url(#circles-1) #fff',
+            opacity: 1,
+            xref: 'x',
+            yref: 'paper',
+            x0: defaultIndependentAxisRange?.min,
+            x1: range.min,
+            y0: 0,
+            y1: 1,
+          },
+          {
+            type: 'rect',
+            line: {
+              width: 0,
+              dash: 'dash',
+            },
+            fillcolor: '#d3d3d3',
+            //DKDK pattern fill?
+            fill: 'url(#circles-1) #fff',
+            opacity: 1,
+            xref: 'x',
+            yref: 'paper',
+            //DKDK test rightCoordinate,
+            x0:
+              defaultIndependentAxisRange?.max !== independentAxisRange?.max
+                ? range.max
+                : defaultIndependentAxisRange?.max,
+            // x0: rightCoordinate,
+            x1: defaultIndependentAxisRange?.max,
+            y0: 0,
+            y1: 1,
+          },
+        ];
+      else
+        return [
+          {
+            type: 'rect',
+            line: {
+              width: 0,
+            },
+            fillcolor: '#d3d3d3',
+            opacity: 1,
+            xref: 'paper',
+            yref: 'y',
+            x0: 0,
+            x1: 1,
+            y0: defaultIndependentAxisRange?.min,
+            y1: range.min,
+          },
+          {
+            type: 'rect',
+            line: {
+              width: 0,
+            },
+            fillcolor: '#d3d3d3',
+            opacity: 1,
+            xref: 'paper',
+            yref: 'y',
+            x0: 0,
+            x1: 1,
+            //DKDK test rightCoordinate,
+            y0: range.max,
+            // y0: rightCoordinate,
+            y1: defaultIndependentAxisRange?.max,
+          },
+        ];
+    } else {
+      return [];
+    }
+  }, [independentAxisRange, orientation, data.series, adjustBinEndToEndOfDay]);
+
+  // //DKDK
+  // console.log('truncatedAxisHighlighting =', truncatedAxisHighlighting)
+
+  //DKDK
   const plotlyIndependentAxisRange = useMemo(() => {
     // here we ensure that no data bins are excluded/hidden from view
     const range = [
-      independentAxisRange && independentAxisRange.min < minBinStart
-        ? independentAxisRange.min
+      defaultIndependentAxisRange &&
+      defaultIndependentAxisRange.min < minBinStart
+        ? defaultIndependentAxisRange.min
         : minBinStart,
-      independentAxisRange && independentAxisRange?.max > maxBinEnd
-        ? independentAxisRange.max
+      defaultIndependentAxisRange &&
+      defaultIndependentAxisRange?.max > maxBinEnd
+        ? defaultIndependentAxisRange.max
         : maxBinEnd,
     ];
     // extend date-based range.max to the end of the day
@@ -361,7 +566,8 @@ export default function Histogram({
     }
   }, [
     data?.valueType,
-    independentAxisRange,
+    //DKDK
+    defaultIndependentAxisRange,
     minBinStart,
     maxBinEnd,
     adjustBinEndToEndOfDay,
@@ -417,7 +623,10 @@ export default function Histogram({
     <PlotlyPlot
       useResizeHandler={true}
       layout={{
-        shapes: selectedRangeHighlighting,
+        //DKDK
+        // shapes: selectedRangeHighlighting,
+        shapes: [...selectedRangeHighlighting, ...truncatedAxisHighlighting],
+        // shapes: truncatedAxisHighlighting,
         // when we implement zooming, we will still use Plotly's select mode
         dragmode: 'select',
         // with a histogram, we can always use 1D selection
