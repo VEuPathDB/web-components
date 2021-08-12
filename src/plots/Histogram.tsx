@@ -341,36 +341,10 @@ export default function Histogram({
     adjustBinEndToEndOfDay,
   ]);
 
-  //DKDK
-  // const plotlyIndependentAxisRange = useMemo(() => {
-  //   // here we ensure that no data bins are excluded/hidden from view
-  //   const range = [
-  //     independentAxisRange && independentAxisRange.min < minBinStart
-  //       ? independentAxisRange.min
-  //       : minBinStart,
-  //     independentAxisRange && independentAxisRange?.max > maxBinEnd
-  //       ? independentAxisRange.max
-  //       : maxBinEnd,
-  //   ];
-  //   // extend date-based range.max to the end of the day
-  //   // (this also avoids excluding a the final bin if binWidth=='day')
-  //   if (data?.valueType === 'date') {
-  //     return [
-  //       range[0],
-  //       adjustBinEndToEndOfDay
-  //         ? DateMath.endOf(new Date(range[1]), 'day').toISOString()
-  //         : range[1],
-  //     ];
-  //   } else {
-  //     return range;
-  //   }
-  // }, [
-  //   data?.valueType,
-  //   independentAxisRange,
-  //   minBinStart,
-  //   maxBinEnd,
-  //   adjustBinEndToEndOfDay,
-  // ]);
+  //DKDK set lowerX0 and upperX1 here for used in layout.axis.range
+  let lowerX0: number | string = 0;
+  let upperX1: number | string = 0;
+  let upperX0: number | string = 0;
 
   //DKDK make rectangular shapes for truncated axis/missing data
   const truncatedAxisHighlighting:
@@ -408,52 +382,74 @@ export default function Histogram({
         defaultIndependentAxisRange?.min,
         defaultIndependentAxisRange?.max
       );
-      console.log('histogram range =', range.min, range.max);
+      console.log(
+        'histogram independentAxisRange = ',
+        independentAxisRange?.min,
+        independentAxisRange?.max
+      );
+
+      console.log('histogram range.min .max =', range.min, range.max);
       console.log('histogram rightCoordinate =', rightCoordinate);
 
-      //DKDK need to check where I will use rightCoordinate...!!!
-      // return [
-      //   {
-      //     type: 'rect',
-      //     ...(orientation === 'vertical'
-      //       ? [{
-      //           xref: 'x',
-      //           yref: 'paper',
-      //           x0: defaultIndependentAxisRange?.min,
-      //           x1: range.min,
-      //           y0: 0,
-      //           y1: 1,
-      //         },
-      //         {
-      //           xref: 'x',
-      //           yref: 'paper',
-      //           x0: range.max,
-      //           x1: defaultIndependentAxisRange?.max,
-      //           y0: 0,
-      //           y1: 1,
-      //         }]
-      //       : [{
-      //           xref: 'paper',
-      //           yref: 'y',
-      //           x0: 0,
-      //           x1: 1,
-      //           y0: defaultIndependentAxisRange?.min,
-      //           y1: range.min,
-      //         },{
-      //           xref: 'paper',
-      //           yref: 'y',
-      //           x0: 0,
-      //           x1: 1,
-      //           y0: range.max,
-      //           y1: defaultIndependentAxisRange?.max,
-      //         }]),
-      //     line: {
-      //       width: 0,
-      //     },
-      //     fillcolor: '#d3d3d3',
-      //     opacity: 1,
-      //   },
-      //   ];
+      //DKDK compute range percentage
+      if (data.valueType != null && data.valueType === 'date') {
+        //DKDK find date diff (days) between range.min and range.max, take 5 % of range, and round up!
+        const dateRangeDiff = Math.round(
+          DateMath.diff(
+            new Date(range?.min as string),
+            new Date(range?.max as string),
+            'day'
+          ) * 0.05
+        ); // unit in days
+
+        console.log('dateRangeDiff =', dateRangeDiff);
+
+        //DKDK somehow defaultIndependentAxisRange.min/max often has Z (UTC), thus compare yyyy-mm-dd only
+        // certainly .spilit('T')[0] would also work
+        lowerX0 =
+          (defaultIndependentAxisRange?.min as string).slice(0, 10) !==
+          (independentAxisRange?.min as string).slice(0, 10)
+            ? DateMath.subtract(
+                new Date(range?.min as string),
+                dateRangeDiff,
+                'day'
+              ).toISOString()
+            : (defaultIndependentAxisRange?.min as string);
+        upperX1 =
+          (defaultIndependentAxisRange?.max as string).slice(0, 10) !==
+          (independentAxisRange?.max as string).slice(0, 10)
+            ? DateMath.add(
+                new Date(range?.max as string),
+                dateRangeDiff,
+                'day'
+              ).toISOString()
+            : // : (defaultIndependentAxisRange?.max as string);
+              rightCoordinate;
+        upperX0 =
+          (defaultIndependentAxisRange?.max as string).slice(0, 10) !==
+          (independentAxisRange?.max as string).slice(0, 10)
+            ? (independentAxisRange?.max as string)
+            : // : (defaultIndependentAxisRange?.max as string);
+              rightCoordinate;
+      } else {
+        lowerX0 =
+          defaultIndependentAxisRange?.min !== independentAxisRange?.min
+            ? (range.min as number) -
+              ((range?.max as number) - (range.min as number)) * 0.05
+            : (defaultIndependentAxisRange?.min as number);
+        upperX1 =
+          defaultIndependentAxisRange?.max !== independentAxisRange?.max
+            ? (range.max as number) +
+              ((range?.max as number) - (range.min as number)) * 0.05
+            : (defaultIndependentAxisRange?.max as number);
+        upperX0 =
+          defaultIndependentAxisRange?.max !== independentAxisRange?.max
+            ? (range.max as number)
+            : (defaultIndependentAxisRange?.max as number);
+      }
+
+      //DKDK
+      console.log('lowerX0, upperX0, upperX1 =', lowerX0, upperX0, upperX1);
 
       //DKDK this works!
       if (orientation === 'vertical')
@@ -470,7 +466,8 @@ export default function Histogram({
             opacity: 1,
             xref: 'x',
             yref: 'paper',
-            x0: defaultIndependentAxisRange?.min,
+            //DKDK
+            x0: lowerX0,
             x1: range.min,
             y0: 0,
             y1: 1,
@@ -487,13 +484,13 @@ export default function Histogram({
             opacity: 1,
             xref: 'x',
             yref: 'paper',
-            //DKDK test rightCoordinate,
-            x0:
-              defaultIndependentAxisRange?.max !== independentAxisRange?.max
-                ? range.max
-                : defaultIndependentAxisRange?.max,
-            // x0: rightCoordinate,
-            x1: defaultIndependentAxisRange?.max,
+            //DKDK
+            // x0:
+            //   defaultIndependentAxisRange?.max !== independentAxisRange?.max
+            //     ? range.max
+            //     : defaultIndependentAxisRange?.max,
+            x0: upperX0,
+            x1: upperX1,
             y0: 0,
             y1: 1,
           },
@@ -511,7 +508,8 @@ export default function Histogram({
             yref: 'y',
             x0: 0,
             x1: 1,
-            y0: defaultIndependentAxisRange?.min,
+            //DKDK
+            y0: lowerX0,
             y1: range.min,
           },
           {
@@ -525,10 +523,13 @@ export default function Histogram({
             yref: 'y',
             x0: 0,
             x1: 1,
-            //DKDK test rightCoordinate,
-            y0: range.max,
-            // y0: rightCoordinate,
-            y1: defaultIndependentAxisRange?.max,
+            //DKDK
+            // y0:
+            //   defaultIndependentAxisRange?.max !== independentAxisRange?.max
+            //     ? range.max
+            //     : defaultIndependentAxisRange?.max,
+            y0: upperX0,
+            y1: upperX1,
           },
         ];
     } else {
@@ -542,16 +543,23 @@ export default function Histogram({
   //DKDK
   const plotlyIndependentAxisRange = useMemo(() => {
     // here we ensure that no data bins are excluded/hidden from view
+    //DKDK DK
+    // const range = [
+    //   defaultIndependentAxisRange &&
+    //   defaultIndependentAxisRange.min < minBinStart
+    //     ? defaultIndependentAxisRange.min
+    //     : minBinStart,
+    //   defaultIndependentAxisRange &&
+    //   defaultIndependentAxisRange?.max > maxBinEnd
+    //     ? defaultIndependentAxisRange.max
+    //     : maxBinEnd,
+    // ];
+    //DKDK Bob's one
     const range = [
-      defaultIndependentAxisRange &&
-      defaultIndependentAxisRange.min < minBinStart
-        ? defaultIndependentAxisRange.min
-        : minBinStart,
-      defaultIndependentAxisRange &&
-      defaultIndependentAxisRange?.max > maxBinEnd
-        ? defaultIndependentAxisRange.max
-        : maxBinEnd,
+      lowerX0 < minBinStart ? lowerX0 : minBinStart,
+      upperX1 > maxBinEnd ? upperX1 : maxBinEnd,
     ];
+
     // extend date-based range.max to the end of the day
     // (this also avoids excluding a the final bin if binWidth=='day')
     if (data?.valueType === 'date') {
