@@ -12,6 +12,8 @@ import {
   BarLayoutAddon,
   DependentAxisLogScaleAddon,
   DependentAxisLogScaleDefault,
+  //DKDK use addon prop for truncated axis
+  TruncationAxisAddon,
 } from '../types/plots';
 import { NumberOrDate, NumberOrDateRange, NumberRange } from '../types/general';
 
@@ -22,6 +24,11 @@ import { sortBy, sortedUniqBy, orderBy, some } from 'lodash';
 // Components
 import PlotlyPlot, { PlotProps } from './PlotlyPlot';
 import { Layout, Shape } from 'plotly.js';
+
+//DKDK reusable functions for truncated axis
+import { truncatedYAxisLayoutRange } from '../utils/truncated-yaxis-range';
+import { truncationAxisRegion } from '../utils/truncation-axis-region';
+import { truncationLayoutShapes } from '../utils/truncation-layout-shapes';
 
 // bin middles needed for highlighting
 interface BinSummary {
@@ -37,7 +44,9 @@ export interface HistogramProps
     OrientationAddon,
     OpacityAddon,
     BarLayoutAddon<'overlay' | 'stack'>,
-    DependentAxisLogScaleAddon {
+    DependentAxisLogScaleAddon,
+    //DKDK use addon prop for truncated axis
+    TruncationAxisAddon {
   /** Label for independent axis. Defaults to `Bins`. */
   independentAxisLabel?: string;
   /** Label for dependent axis. Defaults to `Count`. */
@@ -60,8 +69,6 @@ export interface HistogramProps
   independentAxisRange?: NumberOrDateRange;
   /** if true (default false), adjust binEnds to the end of the day */
   adjustBinEndToEndOfDay?: boolean;
-  /** DKDK default/initial independent axis range */
-  defaultIndependentAxisRange?: NumberOrDateRange;
 }
 
 /** A Plot.ly based histogram component. */
@@ -81,8 +88,10 @@ export default function Histogram({
   isZoomed = false,
   independentAxisRange,
   adjustBinEndToEndOfDay = false,
-  //DKDK
+  //DKDK from TruncationAxisAddon
   defaultIndependentAxisRange,
+  dataDependentAxisRange,
+  truncationConfig,
   ...restProps
 }: HistogramProps) {
   /**
@@ -341,10 +350,15 @@ export default function Histogram({
     adjustBinEndToEndOfDay,
   ]);
 
-  //DKDK set lowerX0 and upperX1 here for used in layout.axis.range
-  let lowerX0: number | string = 0;
-  let upperX1: number | string = 0;
-  let upperX0: number | string = 0;
+  //DKDK set truncated axis area
+  let independentAxisLowerExtensionStart: number | string = 0;
+  let independentAxisLowerExtensionEnd: number | string = 0;
+  let independentAxisUpperExtensionStart: number | string = 0;
+  let independentAxisUpperExtensionEnd: number | string = 0;
+  let dependentAxisUpperExtensionStart: number | undefined = 0;
+  let dependentAxisUpperExtensionEnd: number | undefined = 0;
+  let dependentAxisLowerExtensionStart: number | undefined = 0;
+  let dependentAxisLowerExtensionEnd: number | undefined = 0;
 
   //DKDK make rectangular shapes for truncated axis/missing data
   const truncatedAxisHighlighting:
@@ -362,202 +376,72 @@ export default function Histogram({
           : maxBinEnd,
     };
     //DKDK add condition... but this does not work as the case that only min or max changes do not work
-    if (
-      data.series.length &&
-      range
-      // && defaultIndependentAxisRange?.min !== independentAxisRange?.min
-      // && defaultIndependentAxisRange?.max !== independentAxisRange?.max
-    ) {
-      // for dates, draw the blue area to the end of the day
-      const rightCoordinate =
-        data.valueType === 'number'
-          ? range.max
-          : adjustBinEndToEndOfDay
-          ? DateMath.endOf(new Date(range.max), 'day').toISOString()
-          : range.max;
+    if (data.series.length && range) {
+      //DKDK find truncation region
+      ({
+        independentAxisLowerExtensionStart,
+        independentAxisLowerExtensionEnd,
+        independentAxisUpperExtensionStart,
+        independentAxisUpperExtensionEnd,
+        dependentAxisUpperExtensionStart,
+        dependentAxisUpperExtensionEnd,
+        dependentAxisLowerExtensionStart,
+        dependentAxisLowerExtensionEnd,
+      } = truncationAxisRegion(
+        data.valueType,
+        //DKDK default adjustBinEndToEndOfDay is false defined in the function
+        adjustBinEndToEndOfDay,
+        range,
+        independentAxisRange,
+        defaultIndependentAxisRange,
+        dependentAxisRange,
+        dataDependentAxisRange,
+        truncationConfig
+      ));
 
-      //DKDK
-      console.log(
-        'histogram defaultIndependentAxisRange = ',
-        defaultIndependentAxisRange?.min,
-        defaultIndependentAxisRange?.max
+      //DKDK make layout.shapes for truncated axis
+      const filteredTruncationLayoutShapes = truncationLayoutShapes(
+        orientation,
+        independentAxisLowerExtensionStart,
+        independentAxisLowerExtensionEnd,
+        independentAxisUpperExtensionStart,
+        independentAxisUpperExtensionEnd,
+        dependentAxisUpperExtensionStart,
+        dependentAxisUpperExtensionEnd,
+        dependentAxisLowerExtensionStart,
+        dependentAxisLowerExtensionEnd,
+        truncationConfig
       );
+
       console.log(
-        'histogram independentAxisRange = ',
-        independentAxisRange?.min,
-        independentAxisRange?.max
+        'filteredTruncationLayoutShapes = ',
+        filteredTruncationLayoutShapes
       );
 
-      console.log('histogram range.min .max =', range.min, range.max);
-      console.log('histogram rightCoordinate =', rightCoordinate);
-
-      //DKDK compute range percentage
-      if (data.valueType != null && data.valueType === 'date') {
-        //DKDK find date diff (days) between range.min and range.max, take 5 % of range, and round up!
-        const dateRangeDiff = Math.round(
-          DateMath.diff(
-            new Date(range?.min as string),
-            new Date(range?.max as string),
-            'day'
-          ) * 0.05
-        ); // unit in days
-
-        console.log('dateRangeDiff =', dateRangeDiff);
-
-        //DKDK somehow defaultIndependentAxisRange.min/max often has Z (UTC), thus compare yyyy-mm-dd only
-        // certainly .spilit('T')[0] would also work
-        lowerX0 =
-          (defaultIndependentAxisRange?.min as string).slice(0, 10) !==
-          (independentAxisRange?.min as string).slice(0, 10)
-            ? DateMath.subtract(
-                new Date(range?.min as string),
-                dateRangeDiff,
-                'day'
-              ).toISOString()
-            : (defaultIndependentAxisRange?.min as string);
-        upperX1 =
-          (defaultIndependentAxisRange?.max as string).slice(0, 10) !==
-          (independentAxisRange?.max as string).slice(0, 10)
-            ? DateMath.add(
-                new Date(range?.max as string),
-                dateRangeDiff,
-                'day'
-              ).toISOString()
-            : // : (defaultIndependentAxisRange?.max as string);
-              rightCoordinate;
-        upperX0 =
-          (defaultIndependentAxisRange?.max as string).slice(0, 10) !==
-          (independentAxisRange?.max as string).slice(0, 10)
-            ? (independentAxisRange?.max as string)
-            : // : (defaultIndependentAxisRange?.max as string);
-              rightCoordinate;
-      } else {
-        lowerX0 =
-          defaultIndependentAxisRange?.min !== independentAxisRange?.min
-            ? (range.min as number) -
-              ((range?.max as number) - (range.min as number)) * 0.05
-            : (defaultIndependentAxisRange?.min as number);
-        upperX1 =
-          defaultIndependentAxisRange?.max !== independentAxisRange?.max
-            ? (range.max as number) +
-              ((range?.max as number) - (range.min as number)) * 0.05
-            : (defaultIndependentAxisRange?.max as number);
-        upperX0 =
-          defaultIndependentAxisRange?.max !== independentAxisRange?.max
-            ? (range.max as number)
-            : (defaultIndependentAxisRange?.max as number);
-      }
-
-      //DKDK
-      console.log('lowerX0, upperX0, upperX1 =', lowerX0, upperX0, upperX1);
-
-      //DKDK this works!
-      if (orientation === 'vertical')
-        return [
-          {
-            type: 'rect',
-            line: {
-              width: 0,
-              dash: 'dash',
-            },
-            fillcolor: '#d3d3d3',
-            //DKDK pattern fill?
-            fill: 'url(#circles-1) #fff',
-            opacity: 1,
-            xref: 'x',
-            yref: 'paper',
-            //DKDK
-            x0: lowerX0,
-            x1: range.min,
-            y0: 0,
-            y1: 1,
-          },
-          {
-            type: 'rect',
-            line: {
-              width: 0,
-              dash: 'dash',
-            },
-            fillcolor: '#d3d3d3',
-            //DKDK pattern fill?
-            fill: 'url(#circles-1) #fff',
-            opacity: 1,
-            xref: 'x',
-            yref: 'paper',
-            //DKDK
-            // x0:
-            //   defaultIndependentAxisRange?.max !== independentAxisRange?.max
-            //     ? range.max
-            //     : defaultIndependentAxisRange?.max,
-            x0: upperX0,
-            x1: upperX1,
-            y0: 0,
-            y1: 1,
-          },
-        ];
-      else
-        return [
-          {
-            type: 'rect',
-            line: {
-              width: 0,
-            },
-            fillcolor: '#d3d3d3',
-            opacity: 1,
-            xref: 'paper',
-            yref: 'y',
-            x0: 0,
-            x1: 1,
-            //DKDK
-            y0: lowerX0,
-            y1: range.min,
-          },
-          {
-            type: 'rect',
-            line: {
-              width: 0,
-            },
-            fillcolor: '#d3d3d3',
-            opacity: 1,
-            xref: 'paper',
-            yref: 'y',
-            x0: 0,
-            x1: 1,
-            //DKDK
-            // y0:
-            //   defaultIndependentAxisRange?.max !== independentAxisRange?.max
-            //     ? range.max
-            //     : defaultIndependentAxisRange?.max,
-            y0: upperX0,
-            y1: upperX1,
-          },
-        ];
+      // return truncationLayoutShapes != null ? truncationLayoutShapes : []
+      return filteredTruncationLayoutShapes;
     } else {
       return [];
     }
-  }, [independentAxisRange, orientation, data.series, adjustBinEndToEndOfDay]);
-
-  // //DKDK
-  // console.log('truncatedAxisHighlighting =', truncatedAxisHighlighting)
+  }, [
+    independentAxisRange,
+    orientation,
+    data.series,
+    adjustBinEndToEndOfDay,
+    dataDependentAxisRange,
+    truncationConfig,
+  ]);
 
   //DKDK
   const plotlyIndependentAxisRange = useMemo(() => {
-    // here we ensure that no data bins are excluded/hidden from view
-    //DKDK DK
-    // const range = [
-    //   defaultIndependentAxisRange &&
-    //   defaultIndependentAxisRange.min < minBinStart
-    //     ? defaultIndependentAxisRange.min
-    //     : minBinStart,
-    //   defaultIndependentAxisRange &&
-    //   defaultIndependentAxisRange?.max > maxBinEnd
-    //     ? defaultIndependentAxisRange.max
-    //     : maxBinEnd,
-    // ];
-    //DKDK Bob's one
+    //DKDK set range variable using truncated region
     const range = [
-      lowerX0 < minBinStart ? lowerX0 : minBinStart,
-      upperX1 > maxBinEnd ? upperX1 : maxBinEnd,
+      independentAxisLowerExtensionStart < minBinStart
+        ? independentAxisLowerExtensionStart
+        : minBinStart,
+      independentAxisUpperExtensionEnd > maxBinEnd
+        ? independentAxisUpperExtensionEnd
+        : maxBinEnd,
     ];
 
     // extend date-based range.max to the end of the day
@@ -574,12 +458,17 @@ export default function Histogram({
     }
   }, [
     data?.valueType,
-    //DKDK
-    defaultIndependentAxisRange,
     minBinStart,
     maxBinEnd,
     adjustBinEndToEndOfDay,
+    //DKDK dependency
+    truncationConfig,
+    defaultIndependentAxisRange,
+    //DKDK temp add
+    independentAxisRange,
   ]);
+
+  console.log('plotlyIndependentAxisRange =', plotlyIndependentAxisRange);
 
   const independentAxisLayout: Layout['xaxis'] | Layout['yaxis'] = {
     type: data?.valueType === 'date' ? 'date' : 'linear',
@@ -617,24 +506,37 @@ export default function Histogram({
       text: dependentAxisLabel,
     },
     // range should be an array
+    //DKDK use resuable function, truncatedYAxisLayoutRange
     range: data.series.length
-      ? [dependentAxisRange?.min, dependentAxisRange?.max].map((val) =>
-          dependentAxisLogScale && val != null ? Math.log10(val || 1) : val
-        )
+      ? truncatedYAxisLayoutRange(
+          truncationConfig,
+          dataDependentAxisRange,
+          dependentAxisLowerExtensionEnd,
+          dependentAxisUpperExtensionEnd,
+          dependentAxisLogScale
+        ) ?? [undefined, undefined]
       : [0, 10],
+
     dtick: dependentAxisLogScale ? 1 : undefined,
     tickfont: data.series.length ? {} : { color: 'transparent' },
     showline: true,
   };
 
+  //DKDK
+  console.log(
+    'dependentAxisLowerExtensionEnd, dependentAxisUpperExtensionEnd = ',
+    dependentAxisLowerExtensionEnd,
+    dependentAxisUpperExtensionEnd
+  );
+  console.log('independentAxisLayout =', independentAxisLayout);
+  console.log('dependentAxisLayout =', dependentAxisLayout);
+
   return (
     <PlotlyPlot
       useResizeHandler={true}
       layout={{
-        //DKDK
-        // shapes: selectedRangeHighlighting,
+        //DKDK add truncatedAxisHighlighting for layout.shapes
         shapes: [...selectedRangeHighlighting, ...truncatedAxisHighlighting],
-        // shapes: truncatedAxisHighlighting,
         // when we implement zooming, we will still use Plotly's select mode
         dragmode: 'select',
         // with a histogram, we can always use 1D selection

@@ -40,8 +40,8 @@ export type BaseProps<M extends NumberOrDateRange> = {
   clearButtonLabel?: string;
   /** DKDK default/initial independent axis range */
   defaultIndependentAxisRange?: NumberOrDateRange;
-  /** DKDK check axis range control */
-  isAxisRangeControl?: boolean;
+  /** DKDK check truncated axis */
+  isAxisTruncated?: boolean;
 };
 
 export type NumberRangeInputProps = BaseProps<NumberRange>;
@@ -85,8 +85,8 @@ function BaseInput({
   clearButtonLabel = 'Clear',
   //DKDK
   defaultIndependentAxisRange,
-  //DKDK set default isAxisRangeControl is false
-  isAxisRangeControl = false,
+  //DKDK set default isAxisTruncated is false
+  isAxisTruncated = false,
 }: BaseInputProps) {
   if (validator && (required || rangeBounds))
     console.log(
@@ -138,14 +138,14 @@ function BaseInput({
           setValidationWarning('');
           //DKDK
           if (
-            isAxisRangeControl &&
+            isAxisTruncated &&
             (defaultIndependentAxisRange?.min !== range?.min ||
               defaultIndependentAxisRange?.max !== range?.max)
           ) {
             // setTruncatedAxisWarning('Gray shadow(s) indicates that data is truncated/not shown due to your range selection');
             // setTruncatedAxisWarning('Gray shadow(s) indicates that data is truncated/not shown' + <br /> + 'due to your range selection');
             setTruncatedAxisWarning(
-              'Data is truncated/not shown (Gray area) by range selection'
+              'Data is truncated (light gray area) by range selection'
             );
             // setTruncatedAxisWarning(truncatedAxisTextSpan);
           }

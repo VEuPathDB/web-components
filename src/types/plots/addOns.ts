@@ -4,6 +4,7 @@
 
 import { CSSProperties } from 'react';
 import { BarLayoutOptions, OrientationOptions } from '.';
+import { NumberOrDateRange } from '../general';
 
 /** PlotProps addons */
 
@@ -97,3 +98,24 @@ export type AvailableUnitsAddon =
       /** Currently selected unit. */
       selectedUnit?: never;
     };
+
+/** DKDK truncated axis addons: will see if all props here are appropriate for other applications */
+export type TruncationAxisAddon = {
+  /** DKDK default independent axis range */
+  defaultIndependentAxisRange?: NumberOrDateRange;
+  /** DKDK dependent axis min/max computed from data */
+  dataDependentAxisRange?: { min: number | undefined; max: number | undefined };
+  /** DKDK truncation config (flags) to show truncated axis (true) or not (false) */
+  truncationConfig?: truncationConfig;
+};
+
+export type truncationConfig = {
+  independentAxis: {
+    min: boolean;
+    max: boolean;
+  };
+  dependentAxis: {
+    min: boolean;
+    max: boolean;
+  };
+};

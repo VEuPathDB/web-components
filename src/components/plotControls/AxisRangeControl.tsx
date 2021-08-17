@@ -20,6 +20,7 @@ export interface AxisRangeControlProps
   onRangeChange?: (newRange?: NumberOrDateRange) => void;
   /** DKDK default/initial independent axis range */
   defaultIndependentAxisRange?: NumberOrDateRange;
+  isAxisTruncated?: boolean;
 }
 
 export default function AxisRangeControl({
@@ -28,8 +29,9 @@ export default function AxisRangeControl({
   range,
   onRangeChange,
   containerStyles,
-  //DKDK
+  //DKDK pass defaultIndependentAxisRange
   defaultIndependentAxisRange,
+  isAxisTruncated = false,
 }: AxisRangeControlProps) {
   const validator = useCallback((range?: NumberOrDateRange): {
     validity: boolean;
@@ -60,10 +62,10 @@ export default function AxisRangeControl({
         allowPartialRange={false}
         containerStyles={containerStyles}
         validator={validator}
-        //DKDK
+        //DKDK defaultIndependentAxisRange
         defaultIndependentAxisRange={defaultIndependentAxisRange}
-        //DKDK add something that this comes from axis range control
-        isAxisRangeControl={true}
+        //DKDK show popup
+        isAxisTruncated={isAxisTruncated}
       />
     ) : (
       <NumberRangeInput
@@ -73,10 +75,10 @@ export default function AxisRangeControl({
         allowPartialRange={false}
         containerStyles={containerStyles}
         validator={validator}
-        //DKDK
+        //DKDK pass defaultIndependentAxisRange
         defaultIndependentAxisRange={defaultIndependentAxisRange}
-        //DKDK add something that this comes from axis range control
-        isAxisRangeControl={true}
+        //DKDK show popup
+        isAxisTruncated={isAxisTruncated}
       />
     )
   ) : null;
