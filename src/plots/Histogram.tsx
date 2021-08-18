@@ -46,7 +46,6 @@ export interface HistogramProps
     OpacityAddon,
     BarLayoutAddon<'overlay' | 'stack'>,
     DependentAxisLogScaleAddon,
-    ColorPaletteAddon,
     //DKDK use addon prop for truncated axis
     TruncationAxisAddon {
   /** Label for independent axis. Defaults to `Bins`. */
