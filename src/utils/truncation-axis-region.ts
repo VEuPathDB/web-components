@@ -44,58 +44,39 @@ export function truncationAxisRegion(
 
     console.log('dateRangeDiff =', dateRangeDiff);
 
-    independentAxisLowerExtensionStart =
-      truncationConfig?.independentAxis.min &&
-      (defaultIndependentAxisRange?.min as string) !==
-        (independentAxisRange?.min as string)
-        ? DateMath.subtract(
-            new Date(range?.min as string),
-            dateRangeDiff,
-            'day'
-          ).toISOString()
-        : //DKDK what about simply using range?.min
-          // : (defaultIndependentAxisRange?.min as string);
-          (range?.min as string);
+    independentAxisLowerExtensionStart = truncationConfig?.independentAxis.min
+      ? DateMath.subtract(
+          new Date(range?.min as string),
+          dateRangeDiff,
+          'day'
+        ).toISOString()
+      : (range?.min as string);
     independentAxisLowerExtensionEnd = range.min;
-    independentAxisUpperExtensionStart =
-      truncationConfig?.independentAxis.max &&
-      (defaultIndependentAxisRange?.max as string) !==
-        (independentAxisRange?.max as string)
-        ? (independentAxisRange?.max as string)
-        : // : (defaultIndependentAxisRange?.max as string);
-          rightCoordinate;
-    independentAxisUpperExtensionEnd =
-      truncationConfig?.independentAxis.max &&
-      (defaultIndependentAxisRange?.max as string) !==
-        (independentAxisRange?.max as string)
-        ? DateMath.add(
-            new Date(range?.max as string),
-            dateRangeDiff,
-            'day'
-          ).toISOString()
-        : // : (defaultIndependentAxisRange?.max as string);
-          rightCoordinate;
+    independentAxisUpperExtensionStart = truncationConfig?.independentAxis.max
+      ? (independentAxisRange?.max as string)
+      : rightCoordinate;
+    independentAxisUpperExtensionEnd = truncationConfig?.independentAxis.max
+      ? DateMath.add(
+          new Date(range?.max as string),
+          dateRangeDiff,
+          'day'
+        ).toISOString()
+      : rightCoordinate;
   } else {
-    independentAxisLowerExtensionStart =
-      truncationConfig?.independentAxis.min &&
-      defaultIndependentAxisRange?.min !== independentAxisRange?.min
-        ? (range.min as number) -
-          ((range?.max as number) - (range.min as number)) * 0.05
-        : //DKDK what about simply using range?.min
-          // : (defaultIndependentAxisRange?.min as number);
-          (range?.min as number);
+    independentAxisLowerExtensionStart = truncationConfig?.independentAxis.min
+      ? (range.min as number) -
+        ((range?.max as number) - (range.min as number)) * 0.05
+      : (range?.min as number);
     independentAxisLowerExtensionEnd = range.min;
     independentAxisUpperExtensionStart =
       truncationConfig?.independentAxis.max &&
       defaultIndependentAxisRange?.max !== independentAxisRange?.max
         ? (range.max as number)
         : (defaultIndependentAxisRange?.max as number);
-    independentAxisUpperExtensionEnd =
-      truncationConfig?.independentAxis.max &&
-      defaultIndependentAxisRange?.max !== independentAxisRange?.max
-        ? (range.max as number) +
-          ((range?.max as number) - (range.min as number)) * 0.05
-        : (defaultIndependentAxisRange?.max as number);
+    independentAxisUpperExtensionEnd = truncationConfig?.independentAxis.max
+      ? (range.max as number) +
+        ((range?.max as number) - (range.min as number)) * 0.05
+      : (defaultIndependentAxisRange?.max as number);
   }
 
   //DKDK dependent axis lower...: let's set the start be the dependentAxisRange.min!
@@ -120,7 +101,7 @@ export function truncationAxisRegion(
     ? dependentAxisRange?.min != null
       ? dependentAxisRange?.min * 1.05 - dependentAxisRange?.max * 0.05
       : (dataDependentAxisRange?.min as number) * 1.05 -
-        (dataDependentAxisRange?.max as number) * 0.05 //DKDK used max value!
+        (dataDependentAxisRange?.max as number) * 0.05
     : undefined;
 
   console.log(
