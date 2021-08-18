@@ -68,11 +68,9 @@ export function truncationAxisRegion(
         ((range?.max as number) - (range.min as number)) * 0.05
       : (range?.min as number);
     independentAxisLowerExtensionEnd = range.min;
-    independentAxisUpperExtensionStart =
-      truncationConfig?.independentAxis.max &&
-      defaultIndependentAxisRange?.max !== independentAxisRange?.max
-        ? (range.max as number)
-        : (defaultIndependentAxisRange?.max as number);
+    independentAxisUpperExtensionStart = truncationConfig?.independentAxis.max
+      ? (range.max as number)
+      : (defaultIndependentAxisRange?.max as number);
     independentAxisUpperExtensionEnd = truncationConfig?.independentAxis.max
       ? (range.max as number) +
         ((range?.max as number) - (range.min as number)) * 0.05
