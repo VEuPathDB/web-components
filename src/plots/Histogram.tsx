@@ -12,7 +12,6 @@ import {
   BarLayoutAddon,
   DependentAxisLogScaleAddon,
   DependentAxisLogScaleDefault,
-  ColorPaletteAddon,
   //DKDK use addon prop for truncated axis
   TruncationAxisAddon,
 } from '../types/plots';
