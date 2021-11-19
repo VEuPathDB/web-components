@@ -62,7 +62,7 @@ export default function PlotLegend({
         >
           <div
             title={legendTitle}
-            style={{ cursor: 'pointer', fontSize: legendTextSize }}
+            style={{ cursor: 'default', fontSize: legendTextSize }}
           >
             {legendTitle != null
               ? legendEllipsis(legendTitle, 23)
@@ -216,7 +216,7 @@ export default function PlotLegend({
                   <label
                     title={item.label}
                     style={{
-                      // cursor: 'pointer',
+                      cursor: 'default',
                       // display: 'flex',
                       // alignItems: 'center',
                       position: 'relative',
