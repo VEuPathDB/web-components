@@ -77,6 +77,7 @@ export default function PlotLegend({
                     id={item.label}
                     value={item.label}
                     color="primary"
+                    // color="default"
                     onChange={(e) => {
                       handleLegendCheckboxClick(e.target.checked, item.label);
                     }}
@@ -215,9 +216,11 @@ export default function PlotLegend({
                   <label
                     title={item.label}
                     style={{
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
+                      // cursor: 'pointer',
+                      // display: 'flex',
+                      // alignItems: 'center',
+                      position: 'relative',
+                      margin: 'auto 0px',
                       fontSize: legendTextSize,
                       // gray out for filtered item
                       color:
