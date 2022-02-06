@@ -8,6 +8,8 @@
     "url": "https://github.com/veupathdb/web-components.git"
   },
   "dependencies": {
+    "@chart-parts/react": "^0.1.3",
+    "@chart-parts/react-svg-renderer": "^0.1.3",
     "@emotion/react": "^11.7.0",
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
