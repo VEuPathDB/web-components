@@ -14,46 +14,32 @@ import {
 } from '@chart-parts/react';
 import { memo, useState, useCallback, FC } from 'react';
 import {
-  BarLayoutAddon,
   BarplotData,
-  OpacityAddon,
   OpacityDefault,
-  OrientationAddon,
   OrientationDefault,
-  DependentAxisLogScaleAddon,
   DependentAxisLogScaleDefault,
 } from '../types/plots';
-import { NumberRange } from '../types/general';
-import { PlotProps } from './PlotlyPlot';
-
-// need to look closer at PlotProps and the addOns
-// not sure whats specific to plotly or not or if this needs refactoring or replacing
-export interface BarplotProps
-  extends PlotProps<BarplotData>,
-    BarLayoutAddon<'overlay' | 'stack' | 'group'>,
-    OrientationAddon,
-    OpacityAddon,
-    DependentAxisLogScaleAddon {
-  /** Label for independent axis. e.g. 'Country' */
-  independentAxisLabel?: string;
-  /** Label for dependent axis. Defaults to 'Count' */
-  dependentAxisLabel?: string;
-  /** Show value for each bar */
-  showValues?: boolean;
-  /** show/hide independent axis tick label, default is true */
-  showIndependentAxisTickLabel?: boolean;
-  /** show/hide dependent axis tick label, default is true */
-  showDependentAxisTickLabel?: boolean;
-  /** dependent axis range: required for showing ticks and their labels properly for log scale */
-  dependentAxisRange?: NumberRange;
-}
+import { BarplotProps } from './Barplot';
 
 const EmptyBarplotData: BarplotData = { series: [] };
 
 /**
  * Adapted from https://vega.github.io/vega/examples/bar-chart/
  */
-export const BarChart: FC = memo(function BarChart() {
+export const BarChart: FC<BarplotProps> = memo(function BarChart({
+  data = EmptyBarplotData,
+  independentAxisLabel,
+  dependentAxisLabel,
+  showValues = false,
+  orientation = OrientationDefault,
+  opacity = OpacityDefault,
+  barLayout = 'group',
+  showIndependentAxisTickLabel = true,
+  showDependentAxisTickLabel = true,
+  dependentAxisLogScale = DependentAxisLogScaleDefault,
+  dependentAxisRange,
+  ...restProps
+}: BarplotProps) {
   const [hoverIndex, setHoverIndex] = useState<number | undefined>();
   const onEnterRect = useCallback(
     ({ index }) => {
@@ -88,7 +74,7 @@ export const BarChart: FC = memo(function BarChart() {
     <Chart
       width={400}
       height={200}
-      data={dataset}
+      data={data}
       title="Bar Chart"
       description="An example bar chart"
     >
