@@ -31,16 +31,15 @@ const data = {
     {
       label: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
       value: [28, 55, 43, 91, 81, 53, 19, 87],
+      name: 'im a label',
     },
   ],
 };
 
-const Template: Story<BarplotProps> = (args) => <BarChart {...args} />;
-
 export const example = () => (
   <div className="App">
     <ChartingProvider value={svgRenderer}>
-      <BarChart />
+      <BarChart data={data} />
     </ChartingProvider>
   </div>
 );

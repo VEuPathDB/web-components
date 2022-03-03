@@ -40,6 +40,12 @@ export const BarChart: FC<BarplotProps> = memo(function BarChart({
   dependentAxisRange,
   ...restProps
 }: BarplotProps) {
+  const dataSet = data.series[0];
+  const dataSetArray = dataSet.label.map((label, index) => ({
+    label: dataSet.label[index],
+    value: dataSet.value[index],
+  }));
+  const inputData = { dataSetArray };
   const [hoverIndex, setHoverIndex] = useState<number | undefined>();
   const onEnterRect = useCallback(
     ({ index }) => {
@@ -57,31 +63,31 @@ export const BarChart: FC<BarplotProps> = memo(function BarChart({
     },
     [hoverIndex, setHoverIndex]
   );
-  const encodeX = useCallback(({ d, x }) => x(d.category), []);
-  const encodeY = useCallback(({ d, y }) => y(d.amount), []);
+  const encodeX = useCallback(({ d, x }) => x(d.label), []);
+  const encodeY = useCallback(({ d, y }) => y(d.value), []);
   const encodeY2 = useCallback(({ y }) => y(0), []);
   const encodeWidth = useCallback(({ band }) => band(), []);
   const encodeFill = useCallback(
     ({ index }) => (hoverIndex === index ? 'firebrick' : 'steelblue'),
     [hoverIndex]
   );
-  const encodeTitle = useCallback(({ d }) => `Category ${d.category}`, []);
+  const encodeTitle = useCallback(({ d }) => `Category ${d.label}`, []);
   const encodeDescription = useCallback(
-    ({ d }) => `Category ${d.category} value is ${d.amount}`,
+    ({ d }) => `label ${d.label} value is ${d.value}`,
     []
   );
   return (
     <Chart
       width={400}
       height={200}
-      data={data}
+      data={inputData}
       title="Bar Chart"
       description="An example bar chart"
     >
       <Scales />
       <Axes />
       <Rect
-        table="data"
+        table="dataSetArray"
         onMouseEnter={onEnterRect}
         onMouseLeave={onLeaveRect}
         ariaTitle={encodeTitle}
@@ -105,7 +111,7 @@ const Scales: FC = memo(function Scales() {
     <>
       <LinearScale
         name="y"
-        domain="data.amount"
+        domain="dataSetArray.value"
         range={Dimension.Height}
         nice
         zero
@@ -113,7 +119,7 @@ const Scales: FC = memo(function Scales() {
       <BandScale
         name="x"
         bandWidth="band"
-        domain="data.category"
+        domain="dataSetArray.label"
         padding={0.05}
         range={Dimension.Width}
       />
@@ -137,13 +143,19 @@ const HoverTextHighlight: FC<HoverTextHighlightProps> = memo(
   function HoverTextHighlight({ index }) {
     return (
       <Text
-        text={useCallback(({ data }) => data[index].amount, [index])}
+        text={useCallback(({ dataSetArray }) => dataSetArray[index].value, [
+          index,
+        ])}
         fill="black"
         x={useCallback(
-          ({ data, x, band }) => x(data[index].category) + band() / 2,
+          ({ dataSetArray, x, band }) =>
+            x(dataSetArray[index].label) + band() / 2,
           [index]
         )}
-        y={useCallback(({ data, y }) => y(data[index].amount) - 3, [index])}
+        y={useCallback(
+          ({ dataSetArray, y }) => y(dataSetArray[index].value) - 3,
+          [index]
+        )}
         baseline={VerticalTextAlignment.Bottom}
         align={HorizontalAlignment.Center}
       />
