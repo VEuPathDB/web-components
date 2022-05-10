@@ -36,6 +36,12 @@ export default function PlotGradientLegend({
             border: '1px solid #dedede',
             boxShadow: '1px 1px 4px #00000066',
             padding: '1em',
+            display: 'inline-block', // for general usage (e.g., story)
+            // implementing scrolling for vertical direction
+            // maxHeight: 250, // same height with Scatterplot R-square table
+            minWidth: 250, // for firefox
+            overflowX: 'hidden',
+            overflowY: 'auto',
           }}
         >
           <div
@@ -128,52 +134,101 @@ function GradientColorscaleLegend({
     );
   });
 
-  return (
-    <div>
-      <svg id="gradientLegend" height={gradientBoxHeight + 40} width={150}>
-        <defs>
-          <linearGradient id="linearGradient" x1="0" x2="0" y1="1" y2="0">
-            {stopPoints}
-          </linearGradient>
-        </defs>
-        <g style={{ transform: 'translate(0, 10px)' }}>
-          <rect
-            width={gradientBoxWidth}
-            height={gradientBoxHeight}
-            fill="url(#linearGradient)"
-          ></rect>
-          {ticks}
-        </g>
-      </svg>
-      {showMissingness && (
-        <div style={{ display: 'flex' }}>
-          <div style={{ width: '2em' }}>
-            <div
+  // discretized gradient colormap legend
+  if (gradientColorscaleType === 'discretized') {
+    const defaultMarkerSize = '0.8em';
+    const legendTextSize = '1.0em';
+    const discretizedGradientMarkersLabel = range(nTicks).map((a: number) => {
+      return (
+        (a / (nTicks! - 1)) * (legendMax - legendMin) +
+        legendMin
+      ).toFixed(2);
+    });
+
+    return (
+      <div className="plotLegendCheckbox">
+        {discretizedGradientMarkersLabel.map((label: string, index: number) => (
+          <div>
+            <label
+              key={label}
+              title={label}
               style={{
-                textAlign: 'center',
-                fontWeight: 'normal',
-                fontSize: `calc(1.5 * ${legendTextSize})`,
+                // cursor: 'pointer',   // no need to have pointer for gradient colormap
+                display: 'flex',
+                alignItems: 'center',
+                fontSize: legendTextSize,
+                color: '#222',
+                margin: 0,
+              }}
+            >
+              {/* square marker */}
+              <div
+                style={{
+                  height: defaultMarkerSize,
+                  width: defaultMarkerSize,
+                  borderWidth: '0',
+                  backgroundColor:
+                    SequentialGradientColorscale[
+                      SequentialGradientColorscale.length - (index + 1)
+                    ],
+                }}
+              />
+              &nbsp;&nbsp;
+              {label}
+            </label>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  // sequential or divergent case
+  else
+    return (
+      <div>
+        <svg id="gradientLegend" height={gradientBoxHeight + 40} width={150}>
+          <defs>
+            <linearGradient id="linearGradient" x1="0" x2="0" y1="1" y2="0">
+              {stopPoints}
+            </linearGradient>
+          </defs>
+          <g style={{ transform: 'translate(0, 10px)' }}>
+            <rect
+              width={gradientBoxWidth}
+              height={gradientBoxHeight}
+              fill="url(#linearGradient)"
+            ></rect>
+            {ticks}
+          </g>
+        </svg>
+        {showMissingness && (
+          <div style={{ display: 'flex' }}>
+            <div style={{ width: '2em' }}>
+              <div
+                style={{
+                  textAlign: 'center',
+                  fontWeight: 'normal',
+                  fontSize: `calc(1.5 * ${legendTextSize})`,
+                  color: '#999',
+                }}
+              >
+                &times;
+              </div>
+            </div>
+            &nbsp;&nbsp;
+            <label
+              title={'No data'}
+              style={{
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                fontSize: legendTextSize,
                 color: '#999',
               }}
             >
-              &times;
-            </div>
+              <i>{legendEllipsis('No data', 20)}</i>
+            </label>
           </div>
-          &nbsp;&nbsp;
-          <label
-            title={'No data'}
-            style={{
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              fontSize: legendTextSize,
-              color: '#999',
-            }}
-          >
-            <i>{legendEllipsis('No data', 20)}</i>
-          </label>
-        </div>
-      )}
-    </div>
-  );
+        )}
+      </div>
+    );
 }

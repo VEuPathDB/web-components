@@ -445,7 +445,7 @@ export const GradientPlotLegend = () => {
         legendMax={100}
         legendMin={5}
         // Options are 'sequential' and 'divergent'
-        gradientColorscaleType={'divergent'}
+        gradientColorscaleType={'sequential'}
         // pass legend title
         legendTitle={'Very very very long name'}
         nTicks={5}
@@ -471,6 +471,22 @@ export const TestLongLegendItems = () => {
         onCheckedLegendItemsChange={setCheckedLongLegendItems}
         // pass legend title
         legendTitle={'Country'}
+      />
+    </div>
+  );
+};
+
+// discretized gradient colormap legend
+export const DiscretizedGradientPlotLegend = () => {
+  return (
+    <div>
+      <PlotGradientLegend
+        legendMin={0}
+        legendMax={100}
+        // Options are 'sequential', 'divergent', and 'discretized'
+        gradientColorscaleType={'discretized'}
+        legendTitle={'discretized gradient colormap legend'}
+        nTicks={10}
       />
     </div>
   );
