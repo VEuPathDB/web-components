@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { range } from 'd3';
 
 import {
   SequentialGradientColorscale,
   DivergingGradientColorscale,
 } from '../../types/plots/addOns';
+// import { useMemo } from '@storybook/addons';
 
 // set props for custom legend function
 export interface PlotLegendGradientProps {
@@ -138,46 +139,48 @@ function GradientColorscaleLegend({
   if (gradientColorscaleType === 'discretized') {
     const defaultMarkerSize = '0.8em';
     const legendTextSize = '1.0em';
-    const discretizedGradientMarkersLabel = range(nTicks).map((a: number) => {
-      return (
-        (a / (nTicks! - 1)) * (legendMax - legendMin) +
-        legendMin
-      ).toFixed(2);
-    });
+    const discretizedGradientMarkersLabel = useMemo(
+      () =>
+        range(nTicks!).map((a: number) => {
+          const value =
+            (a / (nTicks! - 1)) * (legendMax - legendMin) + legendMin;
+          return Number.isInteger(value) ? value.toString() : value.toFixed(2);
+        }),
+      [nTicks, legendMin, legendMax]
+    );
 
     return (
       <div className="plotLegendCheckbox">
-        {discretizedGradientMarkersLabel.map((label: string, index: number) => (
-          <div>
-            <label
-              key={label}
-              title={label}
-              style={{
-                // cursor: 'pointer',   // no need to have pointer for gradient colormap
-                display: 'flex',
-                alignItems: 'center',
-                fontSize: legendTextSize,
-                color: '#222',
-                margin: 0,
-              }}
-            >
-              {/* square marker */}
-              <div
+        {discretizedGradientMarkersLabel
+          .reverse()
+          .map((label: string, index: number) => (
+            <div>
+              <label
+                key={label}
+                title={label}
                 style={{
-                  height: defaultMarkerSize,
-                  width: defaultMarkerSize,
-                  borderWidth: '0',
-                  backgroundColor:
-                    SequentialGradientColorscale[
-                      SequentialGradientColorscale.length - (index + 1)
-                    ],
+                  // cursor: 'pointer',   // no need to have pointer for gradient colormap
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontSize: legendTextSize,
+                  color: '#222',
+                  margin: 0,
                 }}
-              />
-              &nbsp;&nbsp;
-              {label}
-            </label>
-          </div>
-        ))}
+              >
+                {/* square marker */}
+                <div
+                  style={{
+                    height: defaultMarkerSize,
+                    width: defaultMarkerSize,
+                    borderWidth: '0',
+                    backgroundColor: SequentialGradientColorscale[index],
+                  }}
+                />
+                &nbsp;&nbsp;
+                {label}
+              </label>
+            </div>
+          ))}
       </div>
     );
   }

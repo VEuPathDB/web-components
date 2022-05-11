@@ -477,7 +477,7 @@ export const TestLongLegendItems = () => {
 };
 
 // discretized gradient colormap legend
-export const DiscretizedGradientPlotLegend = () => {
+export const DiscretizedGradientLegend = () => {
   return (
     <div>
       <PlotGradientLegend
