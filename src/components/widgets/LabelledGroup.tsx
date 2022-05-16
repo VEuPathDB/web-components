@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { every } from 'lodash';
 import { Typography } from '@material-ui/core';
+import { MEDIUM_GRAY } from '../../constants/colors';
 
 export interface LabelledGroupProps {
   /** Contents of the menu when opened */
@@ -9,6 +10,8 @@ export interface LabelledGroupProps {
   label: ReactNode;
   /** Additional styles to apply to the widget container. */
   containerStyles?: React.CSSProperties;
+  /** add disabled to show gray-out color for label */
+  disabled?: boolean;
 }
 
 /**
@@ -17,7 +20,7 @@ export interface LabelledGroupProps {
  * But renders nothing if no children are contained within it.
  */
 export default function LabelledGroup(props: LabelledGroupProps) {
-  const { children, label, containerStyles } = props;
+  const { children, label, containerStyles, disabled } = props;
 
   // don't render anything if all the children (or no children) are null
   if (every(React.Children.toArray(children), (child) => child == null))
@@ -43,7 +46,11 @@ export default function LabelledGroup(props: LabelledGroupProps) {
         {label && (
           <Typography
             variant="button"
-            style={{ color: '#222', fontWeight: 500, fontSize: '1.2em' }}
+            style={{
+              color: disabled ? MEDIUM_GRAY : '#222',
+              fontWeight: 500,
+              fontSize: '1.2em',
+            }}
           >
             {label}
           </Typography>
