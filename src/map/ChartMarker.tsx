@@ -221,7 +221,7 @@ export default function ChartMarker(props: ChartMarkerProps) {
   });
 
   // anim check duration exists or not
-  let duration: number = props.duration ? props.duration : 300;
+  const duration: number = props.duration ? props.duration : 300;
 
   const plotSize = 200;
   const marginSize = 5;
