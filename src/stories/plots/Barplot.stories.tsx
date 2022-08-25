@@ -50,7 +50,7 @@ TinyBar.args = {
   legendTitle: 'Domesticated',
   opacity: 0.75,
   interactive: true,
-  title: 'Awesomeness of animals stratified by domestication',
+  title: 'Note how the mouse-over does not work for the smallest bar',
 };
 
 export const EmptyData = Template.bind({});
