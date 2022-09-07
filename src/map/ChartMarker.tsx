@@ -140,7 +140,7 @@ export default function ChartMarker(props: ChartMarkerProps) {
 
   // drawing bars per marker
   fullStat.forEach(function (
-    el: { color: string | undefined; label: string; value: number },
+    el: { color: string; label: string; value: number },
     index: number
   ) {
     // for the case of y-axis range input: a global approach that take global max = icon height
@@ -170,7 +170,7 @@ export default function ChartMarker(props: ChartMarkerProps) {
       barHeight +
       ' fill=' +
       // rgb strings with spaces in them don't work in SVG?
-      el.color?.replace(/\s/g, '') +
+      el.color.replace(/\s/g, '') +
       ' />';
   });
 
