@@ -64,7 +64,7 @@ export default function RadioButtonGroup({
     if (
       onSelectedOptionDisabled != null &&
       disabledList != null &&
-      disabledList.indexOf(selectedOption) >= 0
+      disabledList.includes(selectedOption)
     )
       onSelectedOptionDisabled(selectedOption);
   }, [selectedOption, disabledList, onSelectedOptionDisabled]);
@@ -125,6 +125,9 @@ export default function RadioButtonGroup({
                 textTransform: 'capitalize',
                 // justifyContent: 'start',
                 minWidth: minWidth,
+                cursor: disabledList?.includes(option)
+                  ? 'not-allowed'
+                  : 'pointer',
               }}
             />
           ))}
