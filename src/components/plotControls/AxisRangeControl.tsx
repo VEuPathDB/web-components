@@ -22,6 +22,8 @@ export interface AxisRangeControlProps
   disabled?: boolean;
   /** is this for a log scale axis? If so, we'll validate the min value to be > 0 */
   logScale?: boolean;
+  /** set read-only prop */
+  readOnly?: boolean;
 }
 
 export default function AxisRangeControl({
@@ -33,6 +35,7 @@ export default function AxisRangeControl({
   // add disabled prop to disable input fields: default is false
   disabled = false,
   logScale = false,
+  readOnly = false,
 }: AxisRangeControlProps) {
   const validator = useCallback(
     (
@@ -76,6 +79,7 @@ export default function AxisRangeControl({
         validator={validator}
         // add disabled prop to disable input fields
         disabled={disabled}
+        readOnly={readOnly}
       />
     ) : (
       <NumberRangeInput
@@ -87,6 +91,7 @@ export default function AxisRangeControl({
         validator={validator}
         // add disabled prop to disable input fields
         disabled={disabled}
+        readOnly={readOnly}
       />
     )
   ) : null;

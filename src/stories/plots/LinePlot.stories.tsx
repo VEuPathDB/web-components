@@ -1,15 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import LinePlot, { LinePlotProps } from '../../plots/LinePlot';
 import { FacetedData, LinePlotData } from '../../types/plots';
 import FacetedLinePlot from '../../plots/facetedPlots/FacetedLinePlot';
 import AxisRangeControl from '../../components/plotControls/AxisRangeControl';
-import {
-  NumberRange,
-  NumberOrDateRange,
-  NumberOrTimeDelta,
-  TimeDelta,
-} from '../../types/general';
+import { NumberOrDateRange } from '../../types/general';
 import { Toggle } from '@veupathdb/coreui';
 
 export default {
@@ -164,7 +159,7 @@ Faceted.args = {
   },
 };
 
-//DKDK testing log scale
+// testing log scale
 const dataSetLog = {
   series: [
     {
@@ -181,9 +176,11 @@ const TemplateWithSelectedRangeControls: Story<Omit<LinePlotProps, 'data'>> = (
   const [dependentAxisRange, setDependentAxisRange] = useState<
     NumberOrDateRange | undefined
   >({ min: 1, max: 80 });
-  const [dependentAxisLogScale, setDependentAxisLogScale] = useState<
-    boolean | undefined
-  >(false);
+  const [dependentAxisLogScale, setDependentAxisLogScale] = useState<boolean>(
+    false
+  );
+  const [readOnly, setReadOnly] = useState<boolean>(false);
+  const [disabled, setDisabled] = useState<boolean>(false);
 
   const handleDependentAxisRangeChange = async (
     newRange?: NumberOrDateRange
@@ -191,8 +188,16 @@ const TemplateWithSelectedRangeControls: Story<Omit<LinePlotProps, 'data'>> = (
     setDependentAxisRange(newRange);
   };
 
-  const onDependentAxisLogScaleChange = async (value?: boolean) => {
+  const onDependentAxisLogScaleChange = async (value: boolean) => {
     setDependentAxisLogScale(value);
+  };
+
+  const onReadOnlyChange = async (value: boolean) => {
+    setReadOnly(value);
+  };
+
+  const onDisabledChange = async (value: boolean) => {
+    setDisabled(value);
   };
 
   return (
@@ -203,25 +208,42 @@ const TemplateWithSelectedRangeControls: Story<Omit<LinePlotProps, 'data'>> = (
         dependentAxisRange={dependentAxisRange}
         dependentAxisLogScale={dependentAxisLogScale}
       />
-      <Toggle
-        label="Log scale (will exclude values &le; 0):"
-        value={dependentAxisLogScale ?? false}
-        onChange={onDependentAxisLogScaleChange}
-        styleOverrides={{ container: { marginLeft: '5em' } }}
-      />
+      <div style={{ display: 'flex' }}>
+        <Toggle
+          label="Log scale (will exclude values &le; 0):"
+          value={dependentAxisLogScale ?? false}
+          onChange={onDependentAxisLogScaleChange}
+          styleOverrides={{ container: { marginLeft: '6.2em' } }}
+        />
+        <Toggle
+          label="read-only"
+          value={readOnly}
+          onChange={onReadOnlyChange}
+          styleOverrides={{ container: { marginLeft: '5em' } }}
+        />
+        <Toggle
+          label="disabled"
+          value={disabled}
+          onChange={onDisabledChange}
+          styleOverrides={{ container: { marginLeft: '5em' } }}
+        />
+      </div>
       <div style={{ height: 25 }} />
       <AxisRangeControl
         label="Y-axis range control"
         range={dependentAxisRange}
         onRangeChange={handleDependentAxisRangeChange}
         containerStyles={{ marginLeft: '5em' }}
+        // set readOnly and disabled with toggle
+        readOnly={readOnly}
+        disabled={disabled}
       />
     </div>
   );
 };
 
-export const LogScale = TemplateWithSelectedRangeControls.bind({});
-LogScale.args = {
+export const LogscaleAndReadonly = TemplateWithSelectedRangeControls.bind({});
+LogscaleAndReadonly.args = {
   containerStyles: {
     height: '450px',
     width: '750px',
