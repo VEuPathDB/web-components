@@ -41,6 +41,8 @@ export type BaseProps<M extends NumberOrDateRange> = {
   clearButtonLabel?: string;
   /** add disabled prop to disable input fields */
   disabled?: boolean;
+  /** set read-only prop */
+  readOnly?: boolean;
 };
 
 export type NumberRangeInputProps = BaseProps<NumberRange>;
@@ -84,6 +86,7 @@ function BaseInput({
   clearButtonLabel = 'Clear',
   // add disabled prop to disable input fields
   disabled = false,
+  readOnly = false,
 }: BaseInputProps) {
   if (validator && required)
     console.log(
@@ -188,6 +191,7 @@ function BaseInput({
             }}
             // add disabled prop to disable input fields
             disabled={disabled}
+            readOnly={readOnly}
           />
         ) : (
           <DateInput
@@ -204,6 +208,7 @@ function BaseInput({
             }}
             // add disabled prop to disable input fields
             disabled={disabled}
+            readOnly={readOnly}
           />
         )}
         <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -236,6 +241,7 @@ function BaseInput({
             }}
             // add disabled prop to disable input fields
             disabled={disabled}
+            readOnly={readOnly}
           />
         ) : (
           <DateInput
@@ -252,6 +258,7 @@ function BaseInput({
             }}
             // add disabled prop to disable input fields
             disabled={disabled}
+            readOnly={readOnly}
           />
         )}
         {showClearButton && (

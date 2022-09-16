@@ -31,6 +31,8 @@ type BaseProps<M extends NumberOrDate> = {
   displayRangeViolationWarnings?: boolean;
   /** Disabled? Default is false */
   disabled?: boolean;
+  /** set read-only prop */
+  readOnly?: boolean;
 };
 
 export type NumberInputProps = BaseProps<number>;
@@ -81,6 +83,7 @@ function BaseInput({
   containerStyles,
   displayRangeViolationWarnings = true,
   disabled = false,
+  readOnly = false,
 }: BaseInputProps) {
   if (validator && (required || minValue != null || maxValue != null))
     console.log(
@@ -197,7 +200,7 @@ function BaseInput({
       )}
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         <TextField
-          InputProps={{ classes }}
+          InputProps={{ classes, readOnly: readOnly }}
           value={
             localValue == null
               ? ''
