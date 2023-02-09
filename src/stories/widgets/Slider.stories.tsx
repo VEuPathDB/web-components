@@ -156,7 +156,7 @@ export const reversedGradientSlider: Story<SliderWidgetProps> = (args) => {
       colorSpec={colorSpecProps}
       showTextInput={false}
       // set isReverseSlider: true if reversed slider
-      isReverseSlider={false}
+      isReverseSlider={true}
     />
   );
 };
@@ -176,9 +176,9 @@ const colorSpecProps: SliderWidgetProps['colorSpec'] = {
   tooltip: '#aaa',
   knobColor: '#aaa',
   // normal slider color: e.g., from 0 to 1
-  trackGradientStart: '#fff',
-  trackGradientEnd: '#000',
+  // trackGradientStart: '#fff',
+  // trackGradientEnd: '#000',
   // reversed slider color: e.g., from 1 to 0
-  // trackGradientStart: '#000',
-  // trackGradientEnd: '#fff',
+  trackGradientStart: '#000',
+  trackGradientEnd: '#fff',
 };
