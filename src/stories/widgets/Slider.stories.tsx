@@ -136,3 +136,49 @@ AuxiliaryTextInputHugeNum.args = {
   showTextInput: true,
 };
 AuxiliaryTextInputHugeNum.argTypes = { ...Basic.argTypes };
+
+export const reversedGradientSlider: Story<SliderWidgetProps> = (args) => {
+  const [value, setValue] = useState<number | undefined>(0.5);
+
+  return (
+    <SliderWidget
+      minimum={0}
+      maximum={1}
+      step={0.1}
+      value={value}
+      debounceRateMs={250}
+      onChange={(newValue: number) => {
+        setValue(newValue);
+      }}
+      containerStyles={markerBodyOpacityContainerStyles}
+      showLimits={true}
+      label={'Marker opacity'}
+      colorSpec={colorSpecProps}
+      showTextInput={false}
+      // set isReverseSlider: true if reversed slider
+      isReverseSlider={false}
+    />
+  );
+};
+
+// slider settings
+const markerBodyOpacityContainerStyles = {
+  height: '4em',
+  width: '30em',
+  marginLeft: '1em',
+  marginBottom: '0.5em',
+  marginTop: '5em',
+};
+
+// implement gradient color for slider opacity
+const colorSpecProps: SliderWidgetProps['colorSpec'] = {
+  type: 'gradient',
+  tooltip: '#aaa',
+  knobColor: '#aaa',
+  // normal slider color: e.g., from 0 to 1
+  trackGradientStart: '#fff',
+  trackGradientEnd: '#000',
+  // reversed slider color: e.g., from 1 to 0
+  // trackGradientStart: '#000',
+  // trackGradientEnd: '#fff',
+};

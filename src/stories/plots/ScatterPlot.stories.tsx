@@ -1716,7 +1716,7 @@ Faceted.args = {
 
 export const opacitySlider = () => {
   const disabled = false;
-  const [markerBodyOpacity, setMarkerBodyOpacity] = useState(0);
+  const [markerBodyOpacity, setMarkerBodyOpacity] = useState(0.5);
   const containerStyles = {
     height: 100,
     width: 425,
@@ -1728,8 +1728,12 @@ export const opacitySlider = () => {
     type: 'gradient',
     tooltip: '#aaa',
     knobColor: '#aaa',
+    // normal slider color: e.g., from 0 to 1
     trackGradientStart: '#fff',
     trackGradientEnd: '#000',
+    // reversed slider color: e.g., from 1 to 0
+    // trackGradientStart: '#000',
+    // trackGradientEnd: '#fff',
   };
 
   return (
@@ -1793,7 +1797,7 @@ export const opacitySlider = () => {
         // hide text form
         // showTextInput={true}
         step={0.1}
-        value={0}
+        value={markerBodyOpacity}
         debounceRateMs={250}
         onChange={(newValue: number) => {
           setMarkerBodyOpacity(newValue);
@@ -1804,6 +1808,8 @@ export const opacitySlider = () => {
         disabled={disabled}
         // test gradient color
         colorSpec={colorSpecProps}
+        // set isReverseSlider: true if reversed slider
+        isReverseSlider={false}
       />
     </>
   );
