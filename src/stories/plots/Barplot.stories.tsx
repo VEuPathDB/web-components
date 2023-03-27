@@ -38,6 +38,25 @@ Basic.args = {
   title: 'Awesomeness of animals stratified by domestication',
 };
 
+export const TinyBar = Template.bind({});
+TinyBar.args = {
+  data: {
+    series: [
+      {
+        label: ['dogs', 'cats', 'monkeys'],
+        value: [10000, 10, 1],
+        name: 'Maybe',
+      },
+    ],
+  },
+  dependentAxisLabel: 'Awesomeness',
+  independentAxisLabel: 'Animal',
+  legendTitle: 'Domesticated',
+  opacity: 0.75,
+  interactive: true,
+  title: 'Note how the mouse-over does not work for the smallest bar',
+};
+
 export const EmptyData = Template.bind({});
 EmptyData.args = {
   dependentAxisLabel: 'Dependent axis label',
