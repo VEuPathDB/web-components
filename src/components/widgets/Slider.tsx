@@ -1,5 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import {
+  makeStyles,
+  createMuiTheme,
+  ThemeProvider,
+} from '@material-ui/core/styles';
 import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
 
@@ -53,6 +57,8 @@ export type SliderWidgetProps = {
   showLimits?: boolean;
   /** Disable the slider. Default is false */
   disabled?: boolean;
+  /** is reversed slider? e.g., from max to min */
+  isReverseSlider?: boolean;
 };
 
 /** A customizable slider widget.
@@ -75,6 +81,8 @@ export default function SliderWidget({
   showTextInput,
   showLimits = false,
   disabled = false,
+  // reversed slider option
+  isReverseSlider = false,
 }: SliderWidgetProps) {
   // Used to track whether or not has mouse hovering over widget.
   const [focused, setFocused] = useState(false);
@@ -150,6 +158,12 @@ export default function SliderWidget({
   const valueLabelDisplay = showTextInput ? 'off' : 'auto';
   const fontColor = disabled ? MEDIUM_GRAY : DARK_GRAY; // don't use focus any more?
 
+  // create theme to change the direction of slider
+  // rtl: right to left; ltr: left to right
+  const theme = createMuiTheme({
+    direction: isReverseSlider ? 'rtl' : 'ltr',
+  });
+
   return (
     <div
       style={{
@@ -189,31 +203,35 @@ export default function SliderWidget({
       )}
       {showLimits && minimum != null && maximum != null && (
         <Typography style={{ color: fontColor, fontSize: '0.75em' }}>
-          {minimum}
+          {isReverseSlider ? maximum : minimum}
         </Typography>
       )}
-      <Slider
-        classes={{
-          root: classes.root,
-          rail: classes.rail,
-          track: classes.track,
-          thumb: classes.thumb,
-          valueLabel: classes.valueLabel,
-          disabled: classes.disabled,
-        }}
-        aria-label={label ?? 'slider'}
-        min={minimum}
-        max={maximum}
-        value={localValue ?? 0}
-        step={step}
-        valueLabelDisplay={valueLabelDisplay}
-        valueLabelFormat={valueFormatter}
-        onChange={handleChange}
-        disabled={disabled}
-      />
+      <ThemeProvider theme={theme}>
+        <Slider
+          classes={{
+            root: classes.root,
+            rail: classes.rail,
+            track: classes.track,
+            thumb: classes.thumb,
+            valueLabel: classes.valueLabel,
+            disabled: classes.disabled,
+          }}
+          aria-label={label ?? 'slider'}
+          min={minimum}
+          max={maximum}
+          value={localValue ?? 0}
+          step={step}
+          valueLabelDisplay={valueLabelDisplay}
+          valueLabelFormat={valueFormatter}
+          onChange={handleChange}
+          disabled={disabled}
+          // check whether reversed slider or not
+          track={isReverseSlider ? 'inverted' : 'normal'}
+        />
+      </ThemeProvider>
       {showLimits && minimum != null && maximum != null && (
         <Typography style={{ color: fontColor, fontSize: '0.75em' }}>
-          {maximum}
+          {isReverseSlider ? minimum : maximum}
         </Typography>
       )}
     </div>
