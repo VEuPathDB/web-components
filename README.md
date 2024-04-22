@@ -1,3 +1,8 @@
+> [!WARNING]
+> **This repo is no longer active. See https://github.com/veupathdb/web-monorepo for the latest.**
+
+---
+
 This project is a component library for plots, maps, and other visualization tools, used in VEuPathDB websites. It uses storybook as a dev environment.
 
 ## Dependencies
