@@ -1,5 +1,5 @@
 // widget for radio button group
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -20,6 +20,8 @@ export type RadioButtonGroupProps = {
   selectedOption: string;
   /** Action to take when an option is selected by the user. */
   onOptionSelected: (option: string) => void;
+  /** Action to take if the currently selected option has been disabled. */
+  onSelectedOptionDisabled?: (option: string) => void;
   /** Additional widget container styles. Optional. */
   containerStyles?: React.CSSProperties;
   /** location of radio button label: start: label & button; end: button & label */
@@ -47,6 +49,7 @@ export default function RadioButtonGroup({
   optionLabels,
   selectedOption,
   onOptionSelected,
+  onSelectedOptionDisabled,
   containerStyles = {},
   labelPlacement,
   minWidth,
@@ -57,6 +60,15 @@ export default function RadioButtonGroup({
 }: RadioButtonGroupProps) {
   // perhaps not using focused?
   // const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (
+      onSelectedOptionDisabled != null &&
+      disabledList != null &&
+      disabledList.includes(selectedOption)
+    )
+      onSelectedOptionDisabled(selectedOption);
+  }, [selectedOption, disabledList, onSelectedOptionDisabled]);
 
   return (
     <div
@@ -129,6 +141,9 @@ export default function RadioButtonGroup({
                 fontWeight: 400,
                 textTransform: 'capitalize',
                 minWidth: minWidth,
+                cursor: disabledList?.includes(option)
+                  ? 'not-allowed'
+                  : 'pointer',
               }}
             />
           ))}
